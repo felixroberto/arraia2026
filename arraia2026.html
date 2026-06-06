@@ -244,7 +244,7 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
     </div>
     <h2>Área do Convidado</h2>
     <p>Digite seu DDD + número de celular para acessar sua confirmação</p>
-    <input class="screen-input" type="tel" id="guest-cel" placeholder="Ex: 11999998888" maxlength="11" onkeydown="if(event.key==='Enter')loginGuest()">
+    <input class="screen-input" type="tel" id="guest-cel" placeholder="Ex: 11999998888 ou 11999998888, 11988887777" onkeydown="if(event.key==='Enter')loginGuest()">
     <div id="guest-erro" style="color:#A32D2D;font-size:12px;text-align:center;margin-bottom:8px;display:none">Número não encontrado. Verifique o DDD + número.</div>
     <button class="screen-btn" onclick="loginGuest()">Confirmar presença</button>
     <button class="screen-btn cancel" onclick="fecharScreenGuest()">Cancelar</button>
@@ -516,7 +516,7 @@ function renderCad(v){
       <label>Contribuição (R$)</label>
       <input type="number" id="f-contrib" min="0" value="${v.contrib||0}" placeholder="0">
       <label>Celular do convidado (DDD + número) <span class="lock-icon"><i class="ti ti-lock"></i></span></label>
-      <input type="tel" id="f-cel" placeholder="Ex: 11999998888" maxlength="11" value="${(v.cel||'').replace(/"/g,'&quot;')}">
+      <input type="tel" id="f-cel" placeholder="Ex: 11999998888 ou 11999998888, 11988887777" value="${(v.cel||'').replace(/"/g,'&quot;')}">
       <label>Pessoas no rateio do chopp</label>
       <input type="number" id="f-chopp" min="0" value="${v.chopp||0}" placeholder="0">
       <label>Pagou o chopp?</label>
@@ -959,7 +959,7 @@ function tickTimer(){
 setInterval(tickTimer,1000);
 
 // ══════ FASE 2 ══════
-const ORG_SENHA = 'arraia2026';
+const ORG_SENHA = 'Fe@2026';
 const KEY_PEND = 'arraia2026_pendencias';
 const KEY_MODE = 'arraia2026_mode';
 let modoAtual = 'pub'; // 'org' | 'guest'
@@ -998,7 +998,10 @@ function abrirScreenGuest(){document.getElementById('screen-guest').style.displa
 function fecharScreenGuest(){document.getElementById('screen-guest').style.display='none';}
 function loginGuest(){
   const cel=document.getElementById('guest-cel').value.replace(/\D/g,'');
-  const found=lista.find(d=>d.cel&&d.cel.replace(/\D/g,'')===cel);
+  const found=lista.find(d=>{
+    if(!d.cel) return false;
+    return d.cel.split(',').map(c=>c.replace(/\D/g,'')).some(c=>c===cel);
+  });
   if(!found){document.getElementById('guest-erro').style.display='block';return;}
   guestId=found.id;
   fecharScreenGuest();
