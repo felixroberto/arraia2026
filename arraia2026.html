@@ -145,6 +145,39 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .badge-prato-m{background:#EEEDFE;color:#3C3489;font-size:10px;padding:2px 6px;border-radius:6px;font-weight:500}
 .badge-prato-n{background:#FEE2E2;color:#991B1B;font-size:10px;padding:2px 6px;border-radius:6px;font-weight:600}
 .conf-item.sem-prato-alert{border:1.5px solid #FCA5A5;background:#FFF5F5}
+
+/* ── MODO CONVIDADO ── */
+.modo-convidado .nav-btn:not([data-pub]):not([data-guest]){display:none}
+.screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px}
+.screen-box{background:var(--color-background-primary,#fff);border-radius:16px;padding:24px 20px;width:100%;max-width:400px;background:#FFF9F0;border:2px solid #F0E0C8}
+.screen-box h2{font-family:'Lora',serif;font-size:17px;color:#7A5C10;margin-bottom:6px;text-align:center}
+.screen-box p{font-size:12px;color:#6B4226;text-align:center;margin-bottom:16px;line-height:1.5}
+.screen-input{width:100%;padding:11px 14px;border:1.5px solid #D5B89A;border-radius:10px;font-size:15px;font-family:inherit;background:#fff;color:#2C1A0E;letter-spacing:1px;margin-bottom:10px}
+.screen-input:focus{outline:none;border-color:#7A5C10}
+.screen-btn{width:100%;padding:12px;background:#7A5C10;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+.screen-btn:hover{background:#9A7612}
+.screen-btn.cancel{background:transparent;color:#6B4226;border:1px solid #D5B89A;margin-top:6px}
+.screen-btn.cancel:hover{background:#FFF3E0}
+.screen-logo{text-align:center;margin-bottom:14px}
+.pendente-badge{background:#FEF3C7;color:#92400E;font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600;white-space:nowrap}
+.aprovado-badge{background:#D1FAE5;color:#065F46;font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600;white-space:nowrap}
+.pendencias-bar{background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pendencias-bar span{font-size:12px;color:#92400E;font-weight:500}
+.btn-aprovar{padding:5px 12px;background:#27AE60;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-rejeitar{padding:5px 10px;background:#E74C3C;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:4px}
+.guest-card{background:#fff;border:1.5px solid #F0E0C8;border-radius:14px;padding:16px;margin-bottom:10px}
+.guest-card-nome{font-size:15px;font-weight:600;color:#7A5C10;font-family:'Lora',serif;margin-bottom:2px}
+.guest-card-det{font-size:11px;color:#6B4226;margin-bottom:14px}
+.sugestao-col{flex:1;min-width:0}
+.sugestao-col h3{font-size:11px;font-weight:600;color:#6B4226;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sug-item{font-size:12px;color:#2C1A0E;padding:5px 8px;border-radius:6px;cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:6px}
+.sug-item:hover{background:#FEF3C7}
+.sug-item i{font-size:13px;flex-shrink:0}
+.nav-guest-bar{background:#7A5C10;padding:8px 16px;display:flex;align-items:center;justify-content:space-between}
+.nav-guest-bar span{color:rgba(255,255,255,.8);font-size:12px}
+.nav-guest-bar button{padding:5px 12px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.nav-guest-bar button:hover{background:rgba(255,255,255,.25)}
+.lock-icon{font-size:11px;color:#999;margin-left:4px}
 @media(max-width:480px){.form-row{grid-template-columns:1fr}.topo h1{font-size:14px}.grid2{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -166,6 +199,11 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
     </div>
   </div>
   <span class="edicao">5ª edição</span>
+  <button id="btn-org-acesso" onclick="abrirScreenOrg()" style="background:transparent;border:none;cursor:pointer;padding:4px 6px;opacity:.35;transition:opacity .2s" title="Organizador" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='.35'"><i class="ti ti-lock" style="font-size:16px;color:#fff"></i></button>
+</div>
+<div id="nav-guest-bar" class="nav-guest-bar" style="display:none">
+  <span id="guest-bar-nome"></span>
+  <button onclick="sairModoConvidado()"><i class="ti ti-logout" style="font-size:13px;vertical-align:-2px"></i> Sair</button>
 </div>
 <div class="nav" id="nav">
   <button class="nav-btn on" onclick="ir('dash')"><i class="ti ti-layout-dashboard"></i>Painel</button>
@@ -173,7 +211,9 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
   <button class="nav-btn" onclick="ir('cad')"><i class="ti ti-user-plus"></i>Cadastrar</button>
   <button class="nav-btn" onclick="ir('pratos')"><i class="ti ti-tools-kitchen-2"></i>Pratos</button>
   <button class="nav-btn" onclick="ir('chopp')"><i class="ti ti-beer"></i>Chopp</button>
-  <button class="nav-btn" onclick="ir('pub')"><i class="ti ti-speakerphone"></i>Para todos</button>
+  <button class="nav-btn" onclick="ir('pub')" data-pub="1"><i class="ti ti-speakerphone"></i>Para todos</button>
+  <button class="nav-btn" id="nav-guest-btn" onclick="abrirScreenGuest()" data-guest="1" style="display:none"><i class="ti ti-user-check"></i>Minha presença</button>
+  <button class="nav-btn" id="nav-sug-btn" data-guest="1" style="display:none" onclick="ir('sugestoes')"><i class="ti ti-salad"></i>Sugestões</button>
 </div>
 <div id="pg-dash" class="pg on"></div>
 <div id="pg-lista" class="pg"></div>
@@ -181,8 +221,35 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 <div id="pg-pratos" class="pg"></div>
 <div id="pg-chopp" class="pg"></div>
 <div id="pg-pub" class="pg"></div>
+<div id="pg-guest" class="pg"></div>
+<div id="pg-sugestoes" class="pg"></div>
 <div class="bandeira" style="margin-top:8px"></div>
 <div class="toast" id="toast"></div>
+<div id="screen-org" class="screen" style="display:none">
+  <div class="screen-box">
+    <div class="screen-logo">
+      <svg width="44" height="44" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="#F39C12"/><text x="22" y="16" text-anchor="middle" font-family="serif" font-size="10" font-weight="700" fill="#7A5C10">ARRAIÁ</text><text x="22" y="27" text-anchor="middle" font-family="serif" font-size="14" font-weight="700" fill="#7A5C10">F&amp;W</text><text x="22" y="37" text-anchor="middle" font-family="serif" font-size="8" fill="#7A5C10" letter-spacing="1">2026</text><rect x="2" y="2" width="40" height="4" rx="2" fill="#C0392B"/><rect x="2" y="38" width="40" height="4" rx="2" fill="#C0392B"/></svg>
+    </div>
+    <h2>Acesso do Organizador</h2>
+    <p>Digite a senha para acessar o painel completo</p>
+    <input class="screen-input" type="password" id="org-senha" placeholder="Senha" onkeydown="if(event.key==='Enter')loginOrg()">
+    <button class="screen-btn" onclick="loginOrg()">Entrar</button>
+    <button class="screen-btn cancel" onclick="fecharScreenOrg()">Cancelar</button>
+  </div>
+</div>
+<div id="screen-guest" class="screen" style="display:none">
+  <div class="screen-box">
+    <div class="screen-logo">
+      <svg width="44" height="44" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="#F39C12"/><text x="22" y="16" text-anchor="middle" font-family="serif" font-size="10" font-weight="700" fill="#7A5C10">ARRAIÁ</text><text x="22" y="27" text-anchor="middle" font-family="serif" font-size="14" font-weight="700" fill="#7A5C10">F&amp;W</text><text x="22" y="37" text-anchor="middle" font-family="serif" font-size="8" fill="#7A5C10" letter-spacing="1">2026</text><rect x="2" y="2" width="40" height="4" rx="2" fill="#C0392B"/><rect x="2" y="38" width="40" height="4" rx="2" fill="#C0392B"/></svg>
+    </div>
+    <h2>Área do Convidado</h2>
+    <p>Digite seu DDD + número de celular para acessar sua confirmação</p>
+    <input class="screen-input" type="tel" id="guest-cel" placeholder="Ex: 11999998888" maxlength="11" onkeydown="if(event.key==='Enter')loginGuest()">
+    <div id="guest-erro" style="color:#A32D2D;font-size:12px;text-align:center;margin-bottom:8px;display:none">Número não encontrado. Verifique o DDD + número.</div>
+    <button class="screen-btn" onclick="loginGuest()">Confirmar presença</button>
+    <button class="screen-btn cancel" onclick="fecharScreenGuest()">Cancelar</button>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -204,51 +271,51 @@ function diasRestantes(){
 }
 
 const SEED=[
-  {id:1,nome:"Adriano + Joel + Aline",pessoas:3,criancas:1,contrib:60,pg:true,prato:"Salsicha com molho + Pão + Salgados",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:2,nome:"Ana Laura + Júnior + Kauane + Isis e Joaquim",pessoas:3,criancas:2,contrib:20,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:3,nome:"Anderson + Natália",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Caldo Verde",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:4,nome:"Bruno (primo) & Família",pessoas:2,criancas:1,contrib:0,pg:false,prato:"Bolo de Paçoca + Torta Salgada",tipo:"MISTO",chopp:0,choppPago:false},
-  {id:5,nome:"Bruno e Bia (primos Felix)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:6,nome:"Bruno Gobato + Sheila + Pais",pessoas:5,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:7,nome:"Camila (Prima) & Família",pessoas:2,criancas:2,contrib:40,pg:true,prato:"Torta de Franco com Catupiry",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:8,nome:"Cida, Antônio e Emily",pessoas:3,criancas:0,contrib:60,pg:true,prato:"Bolo de Milho e Paçoquinha",tipo:"DOCE",chopp:0,choppPago:false},
-  {id:9,nome:"Claudia + Tony",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de fubá cremoso e Pinhão",tipo:"MISTO",chopp:0,choppPago:false},
-  {id:10,nome:"Daniela de Lima + Luis + Maria + Felipe + Helaine",pessoas:5,criancas:0,contrib:0,pg:false,prato:"Empadão de Frango com milho e Paçoca de Chocolate",tipo:"MISTO",chopp:0,choppPago:false},
-  {id:11,nome:"Fabio + Bia (Golden Park)",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Caldo de Quenga",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:12,nome:"Fatima + João + Kinho + Naty",pessoas:4,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:13,nome:"Felipe e Júnior",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de Fubá, Pé de Moça e Pé de Moleque",tipo:"DOCE",chopp:0,choppPago:false},
-  {id:14,nome:"Fernanda e Diogo (CVC)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:15,nome:"Fernando e Van (Wei)",pessoas:4,criancas:2,contrib:40,pg:true,prato:"Torta de Carne Seca + Maçã do Amor",tipo:"MISTO",chopp:0,choppPago:false},
-  {id:16,nome:"Florêncio e Priscila e família (Wei)",pessoas:3,criancas:0,contrib:0,pg:false,prato:"Caldo de Mandioca e brigadeiro de Paçoca",tipo:"MISTO",chopp:0,choppPago:false},
-  {id:17,nome:"Franklin + Layz (Paulo)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:18,nome:"Jaqueline Peppe (Bonito) + Tia + Namorado",pessoas:3,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:19,nome:"Juliana Araujo (Bonito)",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:20,nome:"Juliana Cury e Família",pessoas:3,criancas:0,contrib:60,pg:true,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:21,nome:"Karin (Curitiba)",pessoas:1,criancas:0,contrib:0,pg:false,prato:"Pudim de Tapioca",tipo:"DOCE",chopp:0,choppPago:false},
-  {id:22,nome:"Kelen + Leandro (Golden)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Arroz Doce",tipo:"DOCE",chopp:0,choppPago:false},
-  {id:23,nome:"Mãe + Bia",pessoas:2,criancas:0,contrib:0,pg:true,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:24,nome:"Marcia, Antônio e filhos (Postall)",pessoas:5,criancas:0,contrib:100,pg:true,prato:"Salgadinhos",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:25,nome:"Marcos Carvalho",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:26,nome:"Marlene & Família",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Mini Salgados (Coxinha, bolinho de queijo)",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:27,nome:"Midiã e Família",pessoas:2,criancas:3,contrib:40,pg:true,prato:"Bolo de Tapioca",tipo:"DOCE",chopp:0,choppPago:false},
-  {id:28,nome:"Naty + Fabiano (Golden Park)",pessoas:2,criancas:0,contrib:0,pg:true,prato:"Chá de amendoim",tipo:"DOCE",chopp:0,choppPago:false},
-  {id:29,nome:"Netinha",pessoas:1,criancas:3,contrib:20,pg:true,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:30,nome:"Pamela + Jefferson + Anny",pessoas:2,criancas:1,contrib:40,pg:true,prato:"Caldo Verde e Curau Zero Lactose",tipo:"MISTO",chopp:0,choppPago:false},
-  {id:31,nome:"Paulo + Lucas",pessoas:2,criancas:0,contrib:0,pg:true,prato:"Saco de Milho Verde",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:32,nome:"Renato + Luana (CVC)",pessoas:2,criancas:1,contrib:0,pg:true,prato:"Torta de Franco",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:33,nome:"Robert (primo) e Esposa",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:34,nome:"Rosângela e Família",pessoas:4,criancas:0,contrib:80,pg:true,prato:"Doce de Abóbora e Doce de Batata Doce",tipo:"DOCE",chopp:0,choppPago:false},
-  {id:35,nome:"Sarah + Henrique + Lorena",pessoas:2,criancas:1,contrib:40,pg:true,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:36,nome:"Sabrina + Família (CVC)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"Bolo de Pão de Queijo",tipo:"SALGADO",chopp:0,choppPago:false},
-  {id:37,nome:"Silvia + Wagner (Carrefour)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:38,nome:"Susana + Wesley + Laisa",pessoas:3,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:39,nome:"Vavá",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false},
-  {id:40,nome:"Weidna e Karina",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de Milho",tipo:"DOCE",chopp:0,choppPago:false},
-  {id:41,nome:"Yasmin e Kevin (Postall)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Bolo de Paçoca Recheado",tipo:"DOCE",chopp:0,choppPago:false}
+  {id:1,nome:"Adriano + Joel + Aline",pessoas:3,criancas:1,contrib:60,pg:true,prato:"Salsicha com molho + Pão + Salgados",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:2,nome:"Ana Laura + Júnior + Kauane + Isis e Joaquim",pessoas:3,criancas:2,contrib:20,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:3,nome:"Anderson + Natália",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Caldo Verde",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:4,nome:"Bruno (primo) & Família",pessoas:2,criancas:1,contrib:0,pg:false,prato:"Bolo de Paçoca + Torta Salgada",tipo:"MISTO",chopp:0,choppPago:false,cel:""},
+  {id:5,nome:"Bruno e Bia (primos Felix)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:6,nome:"Bruno Gobato + Sheila + Pais",pessoas:5,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:7,nome:"Camila (Prima) & Família",pessoas:2,criancas:2,contrib:40,pg:true,prato:"Torta de Franco com Catupiry",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:8,nome:"Cida, Antônio e Emily",pessoas:3,criancas:0,contrib:60,pg:true,prato:"Bolo de Milho e Paçoquinha",tipo:"DOCE",chopp:0,choppPago:false,cel:""},
+  {id:9,nome:"Claudia + Tony",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de fubá cremoso e Pinhão",tipo:"MISTO",chopp:0,choppPago:false,cel:""},
+  {id:10,nome:"Daniela de Lima + Luis + Maria + Felipe + Helaine",pessoas:5,criancas:0,contrib:0,pg:false,prato:"Empadão de Frango com milho e Paçoca de Chocolate",tipo:"MISTO",chopp:0,choppPago:false,cel:""},
+  {id:11,nome:"Fabio + Bia (Golden Park)",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Caldo de Quenga",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:12,nome:"Fatima + João + Kinho + Naty",pessoas:4,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:13,nome:"Felipe e Júnior",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de Fubá, Pé de Moça e Pé de Moleque",tipo:"DOCE",chopp:0,choppPago:false,cel:""},
+  {id:14,nome:"Fernanda e Diogo (CVC)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:15,nome:"Fernando e Van (Wei)",pessoas:4,criancas:2,contrib:40,pg:true,prato:"Torta de Carne Seca + Maçã do Amor",tipo:"MISTO",chopp:0,choppPago:false,cel:""},
+  {id:16,nome:"Florêncio e Priscila e família (Wei)",pessoas:3,criancas:0,contrib:0,pg:false,prato:"Caldo de Mandioca e brigadeiro de Paçoca",tipo:"MISTO",chopp:0,choppPago:false,cel:""},
+  {id:17,nome:"Franklin + Layz (Paulo)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:18,nome:"Jaqueline Peppe (Bonito) + Tia + Namorado",pessoas:3,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:19,nome:"Juliana Araujo (Bonito)",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:20,nome:"Juliana Cury e Família",pessoas:3,criancas:0,contrib:60,pg:true,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:21,nome:"Karin (Curitiba)",pessoas:1,criancas:0,contrib:0,pg:false,prato:"Pudim de Tapioca",tipo:"DOCE",chopp:0,choppPago:false,cel:""},
+  {id:22,nome:"Kelen + Leandro (Golden)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Arroz Doce",tipo:"DOCE",chopp:0,choppPago:false,cel:""},
+  {id:23,nome:"Mãe + Bia",pessoas:2,criancas:0,contrib:0,pg:true,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:24,nome:"Marcia, Antônio e filhos (Postall)",pessoas:5,criancas:0,contrib:100,pg:true,prato:"Salgadinhos",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:25,nome:"Marcos Carvalho",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:26,nome:"Marlene & Família",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Mini Salgados (Coxinha, bolinho de queijo)",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:27,nome:"Midiã e Família",pessoas:2,criancas:3,contrib:40,pg:true,prato:"Bolo de Tapioca",tipo:"DOCE",chopp:0,choppPago:false,cel:""},
+  {id:28,nome:"Naty + Fabiano (Golden Park)",pessoas:2,criancas:0,contrib:0,pg:true,prato:"Chá de amendoim",tipo:"DOCE",chopp:0,choppPago:false,cel:""},
+  {id:29,nome:"Netinha",pessoas:1,criancas:3,contrib:20,pg:true,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:30,nome:"Pamela + Jefferson + Anny",pessoas:2,criancas:1,contrib:40,pg:true,prato:"Caldo Verde e Curau Zero Lactose",tipo:"MISTO",chopp:0,choppPago:false,cel:""},
+  {id:31,nome:"Paulo + Lucas",pessoas:2,criancas:0,contrib:0,pg:true,prato:"Saco de Milho Verde",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:32,nome:"Renato + Luana (CVC)",pessoas:2,criancas:1,contrib:0,pg:true,prato:"Torta de Franco",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:33,nome:"Robert (primo) e Esposa",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:34,nome:"Rosângela e Família",pessoas:4,criancas:0,contrib:80,pg:true,prato:"Doce de Abóbora e Doce de Batata Doce",tipo:"DOCE",chopp:0,choppPago:false,cel:""},
+  {id:35,nome:"Sarah + Henrique + Lorena",pessoas:2,criancas:1,contrib:40,pg:true,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:36,nome:"Sabrina + Família (CVC)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"Bolo de Pão de Queijo",tipo:"SALGADO",chopp:0,choppPago:false,cel:""},
+  {id:37,nome:"Silvia + Wagner (Carrefour)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:38,nome:"Susana + Wesley + Laisa",pessoas:3,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:39,nome:"Vavá",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:"",chopp:0,choppPago:false,cel:""},
+  {id:40,nome:"Weidna e Karina",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de Milho",tipo:"DOCE",chopp:0,choppPago:false,cel:""},
+  {id:41,nome:"Yasmin e Kevin (Postall)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Bolo de Paçoca Recheado",tipo:"DOCE",chopp:0,choppPago:false,cel:""}
 ];
 
 const KEY='arraia2026v2';
-function carregar(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):SEED.map(d=>({...d,chopp:d.chopp||0}))}catch(e){return SEED.map(d=>({...d,chopp:0,choppPago:false}))}}
+function carregar(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):SEED.map(d=>({...d,chopp:d.chopp||0}))}catch(e){return SEED.map(d=>({...d,chopp:0,choppPago:false,cel:""}))}}
 function salvarLS(){try{localStorage.setItem(KEY,JSON.stringify(lista))}catch(e){}}
 
 let lista=carregar();
@@ -324,6 +391,7 @@ function renderDash(){
   const totConv=s.adultos+s.cri||1;
   const totPrat=s.sal+s.doc+s.mis+s.semPrato||1;
   document.getElementById('pg-dash').innerHTML=`
+    ${modoAtual==='org'?renderPendencias():''}
     <div class="grid2">
       <div class="kpi verm"><div class="kl">Total de pessoas</div><div class="kv">${s.tot}</div><div class="ks">confirmados</div></div>
       <div class="kpi amar"><div class="kl">Adultos</div><div class="kv">${s.adultos}</div><div class="ks">pagantes</div></div>
@@ -447,6 +515,8 @@ function renderCad(v){
       </select>
       <label>Contribuição (R$)</label>
       <input type="number" id="f-contrib" min="0" value="${v.contrib||0}" placeholder="0">
+      <label>Celular do convidado (DDD + número) <span class="lock-icon"><i class="ti ti-lock"></i></span></label>
+      <input type="tel" id="f-cel" placeholder="Ex: 11999998888" maxlength="11" value="${(v.cel||'').replace(/"/g,'&quot;')}">
       <label>Pessoas no rateio do chopp</label>
       <input type="number" id="f-chopp" min="0" value="${v.chopp||0}" placeholder="0">
       <label>Pagou o chopp?</label>
@@ -491,6 +561,7 @@ function salvarConv(){
     tipo:document.getElementById('f-tipo').value,
     contrib:parseInt(document.getElementById('f-contrib').value)||0,
     pg:document.getElementById('f-pg').checked,
+    cel:document.getElementById('f-cel').value.replace(/\D/g,''),
     chopp:parseInt(document.getElementById('f-chopp').value)||0,
     choppPago:document.getElementById('f-chopp-pago').value==='1'
   };
@@ -886,6 +957,221 @@ function tickTimer(){
   es.textContent=pad(Math.floor(diff/1000)%60);
 }
 setInterval(tickTimer,1000);
+
+// ══════ FASE 2 ══════
+const ORG_SENHA = 'arraia2026';
+const KEY_PEND = 'arraia2026_pendencias';
+const KEY_MODE = 'arraia2026_mode';
+let modoAtual = 'pub'; // 'org' | 'guest'
+let guestId = null;
+
+function carregarPendencias(){try{const s=localStorage.getItem(KEY_PEND);return s?JSON.parse(s):[]}catch(e){return[]}}
+function salvarPendencias(p){try{localStorage.setItem(KEY_PEND,JSON.stringify(p))}catch(e){}}
+
+// ── LOGIN ORGANIZADOR ───────────────────────────────────────────
+function abrirScreenOrg(){document.getElementById('screen-org').style.display='flex';document.getElementById('org-senha').focus();}
+function fecharScreenOrg(){document.getElementById('screen-org').style.display='none';document.getElementById('org-senha').value='';}
+function loginOrg(){
+  const v=document.getElementById('org-senha').value;
+  if(v===ORG_SENHA){
+    fecharScreenOrg();
+    ativarModoOrg();
+  } else {
+    document.getElementById('org-senha').style.borderColor='#A32D2D';
+    setTimeout(()=>document.getElementById('org-senha').style.borderColor='',1000);
+  }
+}
+function ativarModoOrg(){
+  modoAtual='org';
+  document.getElementById('nav-guest-bar').style.display='none';
+  document.getElementById('nav').style.display='flex';
+  document.querySelectorAll('.nav-btn').forEach(b=>{b.style.display='';});
+  document.getElementById('nav-guest-btn').style.display='none';
+  document.getElementById('nav-sug-btn').style.display='none';
+  document.getElementById('btn-org-acesso').style.display='none';
+  toast('Bem-vindo, organizador!');
+  ir('dash');
+}
+
+// ── LOGIN CONVIDADO ─────────────────────────────────────────────
+function abrirScreenGuest(){document.getElementById('screen-guest').style.display='flex';document.getElementById('guest-cel').value='';document.getElementById('guest-erro').style.display='none';document.getElementById('guest-cel').focus();}
+function fecharScreenGuest(){document.getElementById('screen-guest').style.display='none';}
+function loginGuest(){
+  const cel=document.getElementById('guest-cel').value.replace(/\D/g,'');
+  const found=lista.find(d=>d.cel&&d.cel.replace(/\D/g,'')===cel);
+  if(!found){document.getElementById('guest-erro').style.display='block';return;}
+  guestId=found.id;
+  fecharScreenGuest();
+  ativarModoConvidado(found);
+}
+function ativarModoConvidado(convidado){
+  modoAtual='guest';
+  // esconder nav principal, mostrar apenas pub + guest + sugestões
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(!b.dataset.pub && !b.dataset.guest) b.style.display='none';
+  });
+  document.getElementById('nav-guest-btn').style.display='';
+  document.getElementById('nav-sug-btn').style.display='';
+  document.getElementById('nav-guest-bar').style.display='flex';
+  document.getElementById('guest-bar-nome').textContent='Olá, ' + convidado.nome.split('+')[0].trim() + '!';
+  ir('guest');
+}
+function sairModoConvidado(){
+  modoAtual='pub';
+  guestId=null;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.style.display='none');
+  document.getElementById('nav-guest-btn').style.display='none';
+  document.getElementById('nav-sug-btn').style.display='none';
+  document.getElementById('nav-guest-bar').style.display='none';
+  document.querySelectorAll('.nav-btn[data-pub]').forEach(b=>b.style.display='');
+  ir('pub');
+}
+
+// ── TELA DO CONVIDADO ──────────────────────────────────────────
+function renderGuest(){
+  const d=lista.find(x=>x.id===guestId);
+  if(!d){document.getElementById('pg-guest').innerHTML='<div style="padding:20px;text-align:center;color:#999">Convidado não encontrado</div>';return;}
+  const pendencias=carregarPendencias();
+  const minhaPend=pendencias.find(p=>p.id===guestId&&p.status==='pendente');
+  const cor=CORES[lista.indexOf(d)%CORES.length];
+  let badgePrato='<span class="badge-prato-n">Prato Pendente</span>';
+  if(d.tipo==='SALGADO') badgePrato='<span class="badge-prato-s">Salgado</span>';
+  else if(d.tipo==='DOCE') badgePrato='<span class="badge-prato-d">Doce</span>';
+  else if(d.tipo==='MISTO') badgePrato='<span class="badge-prato-m">Misto</span>';
+  document.getElementById('pg-guest').innerHTML=`
+    <div style="margin-bottom:10px">
+      <div class="guest-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div class="av" style="width:44px;height:44px;background:${cor}22;color:${cor};font-size:14px">${ini(d.nome)}</div>
+          <div>
+            <div class="guest-card-nome">${d.nome}</div>
+            <div class="guest-card-det">${d.pessoas} pessoa${d.pessoas>1?'s':''} confirmadas${d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+          <span class="${d.pg?'badge-pg-ok':'badge-pg-no'}">${d.pg?'Pagamento - OK':'Pagamento Pendente'}</span>
+          ${badgePrato}
+          ${d.prato?`<span style="font-size:10px;color:#6B4226;background:#FFF3E0;padding:2px 7px;border-radius:6px">${d.prato}</span>`:''}
+        </div>
+        ${d.chopp>0?`<div style="font-size:11px;color:#185FA5;margin-bottom:8px"><i class="ti ti-beer" style="font-size:13px;vertical-align:-2px"></i> ${d.chopp} pessoa${d.chopp>1?'s':''} no rateio do chopp</div>`:''}
+      </div>
+      ${minhaPend?`<div class="pendencias-bar"><div style="display:flex;align-items:center;gap:8px"><i class="ti ti-clock" style="font-size:16px;color:#92400E"></i><span>Você tem uma alteração aguardando aprovação do organizador</span></div><span class="pendente-badge">Pendente</span></div>`:''}
+    </div>
+    <div class="sec">Atualizar minha participação</div>
+    <div class="card">
+      <label>Prato que vou trazer</label>
+      <input type="text" id="g-prato" placeholder="Ex: Bolo de fubá, Caldo verde..." value="${(minhaPend?minhaPend.prato:d.prato)||''}">
+      <label>Tipo do prato</label>
+      <select id="g-tipo">
+        <option value="">Selecione</option>
+        <option value="SALGADO" ${((minhaPend?minhaPend.tipo:d.tipo)||'')==='SALGADO'?'selected':''}>Salgado</option>
+        <option value="DOCE" ${((minhaPend?minhaPend.tipo:d.tipo)||'')==='DOCE'?'selected':''}>Doce</option>
+        <option value="MISTO" ${((minhaPend?minhaPend.tipo:d.tipo)||'')==='MISTO'?'selected':''}>Misto (salgado + doce)</option>
+      </select>
+      <label>Pessoas no rateio do chopp (apenas adultos)</label>
+      <input type="number" id="g-chopp" min="0" value="${minhaPend?minhaPend.chopp:(d.chopp||0)}" placeholder="0">
+      <div style="font-size:11px;color:#6B4226;margin-bottom:10px;display:flex;align-items:flex-start;gap:6px">
+        <i class="ti ti-info-circle" style="font-size:13px;margin-top:1px;flex-shrink:0"></i>
+        <span>Pagamentos e dados pessoais só podem ser atualizados pelo organizador.</span>
+      </div>
+      ${minhaPend?'<div style="font-size:11px;color:#92400E;background:#FEF3C7;border-radius:6px;padding:8px 10px;margin-bottom:10px"><i class="ti ti-alert-circle" style="font-size:13px;vertical-align:-2px"></i> Você já tem uma solicitação pendente. Enviar uma nova substituirá a anterior.</div>':''}
+      <button class="btn-prim" onclick="enviarSolicitacao()"><i class="ti ti-send" style="font-size:15px;vertical-align:-2px"></i> Enviar para aprovação</button>
+      <button class="btn-sec" style="margin-top:8px" onclick="ir('sugestoes')"><i class="ti ti-bulb" style="font-size:14px;vertical-align:-2px"></i> Ver sugestões de pratos juninos</button>
+    </div>`;
+}
+
+function enviarSolicitacao(){
+  const prato=document.getElementById('g-prato').value.trim();
+  const tipo=document.getElementById('g-tipo').value;
+  const chopp=parseInt(document.getElementById('g-chopp').value)||0;
+  const d=lista.find(x=>x.id===guestId);
+  if(!prato){alert('Informe o prato que vai trazer');return;}
+  const pendencias=carregarPendencias().filter(p=>!(p.id===guestId&&p.status==='pendente'));
+  pendencias.push({id:guestId,nome:d.nome,prato,tipo,chopp,status:'pendente',ts:new Date().toISOString()});
+  salvarPendencias(pendencias);
+  toast('Solicitação enviada! Aguardando aprovação.');
+  renderGuest();
+}
+
+// ── PAINEL DE PENDÊNCIAS (para o organizador) ───────────────────
+function renderPendencias(){
+  const pendencias=carregarPendencias().filter(p=>p.status==='pendente');
+  if(!pendencias.length) return '';
+  return `<div class="pendencias-bar" style="flex-direction:column;align-items:flex-start;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px;width:100%">
+      <i class="ti ti-clock" style="font-size:18px;color:#92400E"></i>
+      <span style="font-weight:600">${pendencias.length} solicitação${pendencias.length>1?'ões':''} aguardando aprovação</span>
+    </div>
+    ${pendencias.map(p=>{
+      const d=lista.find(x=>x.id===p.id);
+      return `<div style="background:#fff;border-radius:8px;padding:10px 12px;width:100%;border:1px solid #F0E0C8">
+        <div style="font-size:12px;font-weight:600;color:#2C1A0E;margin-bottom:4px">${p.nome}</div>
+        <div style="font-size:11px;color:#6B4226;margin-bottom:8px">
+          Prato: <b>${p.prato||'—'}</b> · Tipo: <b>${p.tipo||'—'}</b> · Chopp: <b>${p.chopp}</b>
+          ${d?` · (atual: ${d.prato||'sem prato'})`:''}</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn-aprovar" onclick="aprovarPend(${p.id})"><i class="ti ti-check" style="font-size:12px;vertical-align:-1px"></i> Aprovar</button>
+          <button class="btn-rejeitar" onclick="rejeitarPend(${p.id})"><i class="ti ti-x" style="font-size:12px;vertical-align:-1px"></i> Rejeitar</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function aprovarPend(id){
+  const pendencias=carregarPendencias();
+  const p=pendencias.find(x=>x.id===id&&x.status==='pendente');
+  if(!p) return;
+  const idx=lista.findIndex(d=>d.id===id);
+  if(idx>=0){lista[idx].prato=p.prato;lista[idx].tipo=p.tipo;lista[idx].chopp=p.chopp;}
+  p.status='aprovado';
+  salvarPendencias(pendencias);
+  salvarLS();
+  renderAll();
+  renderDash();
+  toast('Aprovado e atualizado!');
+}
+function rejeitarPend(id){
+  const pendencias=carregarPendencias();
+  const p=pendencias.find(x=>x.id===id&&x.status==='pendente');
+  if(!p) return;
+  p.status='rejeitado';
+  salvarPendencias(pendencias);
+  renderDash();
+  toast('Solicitação rejeitada');
+}
+
+// ── SUGESTÕES DE PRATOS ─────────────────────────────────────────
+const SALGADOS_SUG=['Arroz carreteiro','Baião de dois','Biscoito de polvilho','Biscoito de queijo','Bolinho de aipim com carne seca','Bolinho de arroz com queijo','Bolinho de feijoada','Bolo de fubá com queijo','Bolo salgado de milho','Broa de fubá salgada','Cachorro-quente','Caldo de abóbora com carne-seca','Caldo de Ervilha','Caldo de feijão','Caldo de mandioca com carne','Caldo de Quenga','Caldo e Milho','Caldo verde','Canjica salgada','Carne de sol na manteiga','Croquete de milho','Cuscuz nordestino','Cuscuz paulista','Empadão','Empadinha de queijo ou frango','Enroladinho de salsicha','Escondidinho de carne-seca ou frango','Espetinho (carne, frango, queijo coalho)','Farofa de milho com bacon','Feijão tropeiro','Fritada de legumes','Milho assado','Milho cozido','Mini pamonha recheada','Ovos de codorna em conserva','Pamonha salgada','Panqueca de milho','Pão de cebola com fubá','Pão de milho','Pão de queijo','Pão de torresmo','Pastel','Pastel de angu (MG)','Pinhão','Pipoca salgada','Polenta frita ou cremosa','Quibe de abóbora com carne seca','Rocambole salgado de mandioca','Salsicha com molho + Pão','Tapioca de carne seca com queijo coalho','Tapioca salgada','Torradas com creme de milho','Torresmo','Torta caipira de frango com milho','Trouxinha de couve com carne moída','Vaca atolada'];
+const DOCES_SUG=['Arroz Doce','Arroz Doce 3 leites','Banana caramelada ou frita','Bananada','Beijinho de coco','Bolo cremoso de milho','Bolo de aipim (macaxeira/mandioca)','Bolo de amendoim','Bolo de cenoura com cobertura de chocolate','Bolo de coco','Bolo de fubá com erva-doce','Bolo de milho','Bolo de rolo','Bolo formigueiro com chocolate granulado','Bombocado','Brigadeiro de fubá com goiabada','Brigadeiro de milho','Brigadeiro de paçoca','Broa de fubá doce','Cajuzinho de amendoim','Canjica (doce)','Canudinho recheado com doce de leite ou goiabada','Chá de amendoim','Chocolate quente','Churros','Cocada branca ou queimada','Compota de frutas','Curau de milho','Doce de abóbora','Doce de banana com canela','Doce de batata-doce','Doce de caju cristalizado','Doce de figo em calda','Doce de jaca','Doce de laranja da terra','Doce de leite com coco','Doce de leite talhado','Doce de mamão verde','Espetinho de frutas com chocolate','Fubá cremoso com goiabada','Maçã do amor','Maria-mole','Mungunzá','Paçoca de amendoim','Pé-de-moça','Pé-de-moleque','Pipoca doce (colorida ou caramelada)','Pudim de milho','Quebra-queixo','Queijadinha','Rabanada junina','Rapadura','Romeu e Julieta (queijo com goiabada)','Rosquinha de pinga','Sonho recheado','Sorvete de milho verde','Suco de milho','Tapioca doce (com coco e leite condensado)','Torta de milho com coco','Torta de paçoca'];
+
+function renderSugestoes(){
+  document.getElementById('pg-sugestoes').innerHTML=`
+    <div style="font-size:13px;color:#6B4226;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+      <i class="ti ti-bulb" style="font-size:16px;color:#F39C12"></i>
+      Toque em um prato para copiar o nome
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start">
+      <div class="sugestao-col">
+        <h3><span style="color:#E67E22">⬛</span> Salgados (${SALGADOS_SUG.length})</h3>
+        ${SALGADOS_SUG.map(p=>`<div class="sug-item" onclick="copiarSugestao('${p.replace(/'/g,"\\'")}')"><i class="ti ti-salt" style="color:#E67E22"></i>${p}</div>`).join('')}
+      </div>
+      <div class="sugestao-col">
+        <h3><span style="color:#D4537E">⬛</span> Doces (${DOCES_SUG.length})</h3>
+        ${DOCES_SUG.map(p=>`<div class="sug-item" onclick="copiarSugestao('${p.replace(/'/g,"\\'")}')"><i class="ti ti-candy" style="color:#D4537E"></i>${p}</div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function copiarSugestao(nome){
+  if(modoAtual==='guest'){
+    const el=document.getElementById('g-prato');
+    if(el){el.value=nome;ir('guest');toast('Prato selecionado: '+nome);}
+    else{navigator.clipboard&&navigator.clipboard.writeText(nome);toast('Copiado: '+nome);}
+  } else {
+    navigator.clipboard&&navigator.clipboard.writeText(nome);
+    toast('Copiado: '+nome);
+  }
+}
 function renderAll(){renderDash();renderPratos();renderChopp();renderPub()}
 
 function ir(pg){
@@ -900,9 +1186,18 @@ function ir(pg){
   if(pg==='pratos') renderPratos();
   if(pg==='chopp') renderChopp();
   if(pg==='pub'){renderPub();setTimeout(tickTimer,50);}
+  if(pg==='guest') renderGuest();
+  if(pg==='sugestoes') renderSugestoes();
 }
 
 renderAll();renderCad();renderLista();
+// Modo inicial: público — esconder nav completo, mostrar só "Para todos"
+(function(){
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(!b.dataset.pub) b.style.display='none';
+  });
+  ir('pub');
+})();
 </script>
 </body>
 </html>
