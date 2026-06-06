@@ -103,6 +103,42 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .stab.on{background:#7A5C10;color:#fff;border-color:#7A5C10}
 .stab-chopp.on{background:#185FA5;border-color:#185FA5}
 #pub-captura{background:#FFF9F0;padding:16px}
+
+.timer-card{background:#7A5C10;border-radius:16px;padding:20px 16px 16px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden}
+.timer-card::before{content:'';position:absolute;top:-20px;left:-20px;width:120px;height:120px;background:rgba(255,255,255,0.05);border-radius:50%}
+.timer-card::after{content:'';position:absolute;bottom:-30px;right:-20px;width:150px;height:150px;background:rgba(0,0,0,0.08);border-radius:50%}
+.timer-flag{display:flex;justify-content:center;gap:4px;margin-bottom:10px}
+.timer-flag span{width:18px;height:14px;border-radius:2px;display:inline-block}
+.timer-num-wrap{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px}
+.timer-num{background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 14px;font-family:'Lora',serif;font-size:52px;font-weight:700;color:#F39C12;line-height:1;position:relative;z-index:1}
+.timer-txt{font-size:14px;color:rgba(255,255,255,0.85);font-weight:500;position:relative;z-index:1;letter-spacing:.3px}
+.timer-dt{font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px;position:relative;z-index:1}
+.timer-pessoas{display:inline-flex;align-items:center;gap:6px;background:rgba(243,156,18,0.2);border:1px solid rgba(243,156,18,0.4);border-radius:20px;padding:5px 14px;margin-top:10px;position:relative;z-index:1}
+.timer-pessoas span{font-size:13px;color:#F39C12;font-weight:600}
+.timer-pessoas i{font-size:15px;color:#F39C12}
+.pizza-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pizza-card{background:#fff;border:1px solid #F0E0C8;border-radius:12px;padding:12px 10px;text-align:center}
+.pizza-card .pc-titulo{font-size:10px;font-weight:600;color:#6B4226;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.pizza-svg{display:block;margin:0 auto 8px}
+.pizza-leg{display:flex;flex-direction:column;gap:4px}
+.pizza-leg-item{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#6B4226;gap:6px}
+.pizza-leg-cor{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.pizza-leg-pct{font-weight:600;color:#2C1A0E;font-size:11px}
+.conf-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid #F0E0C8;border-radius:10px;margin-bottom:6px}
+.conf-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.conf-info{flex:1;min-width:0}
+.conf-nome{font-size:12px;font-weight:600;color:#2C1A0E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conf-prato{font-size:10px;color:#6B4226;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conf-badges{display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0}
+.badge-pg-ok{background:#D1FAE5;color:#065F46;font-size:10px;padding:2px 7px;border-radius:6px;font-weight:600;white-space:nowrap}
+.badge-pg-no{background:#FEE2E2;color:#991B1B;font-size:10px;padding:2px 7px;border-radius:6px;font-weight:600;white-space:nowrap}
+.badge-chopp-ok{background:#DBEAFE;color:#1E40AF;font-size:10px;padding:2px 7px;border-radius:6px;font-weight:600;white-space:nowrap}
+.badge-chopp-no{background:#FEF3C7;color:#92400E;font-size:10px;padding:2px 7px;border-radius:6px;font-weight:600;white-space:nowrap}
+.badge-prato-s{background:#FEF3C7;color:#633806;font-size:10px;padding:2px 6px;border-radius:6px;font-weight:500}
+.badge-prato-d{background:#FCE7F3;color:#72243E;font-size:10px;padding:2px 6px;border-radius:6px;font-weight:500}
+.badge-prato-m{background:#EEEDFE;color:#3C3489;font-size:10px;padding:2px 6px;border-radius:6px;font-weight:500}
+.badge-prato-n{background:#FEE2E2;color:#991B1B;font-size:10px;padding:2px 6px;border-radius:6px;font-weight:600}
+.conf-item.sem-prato-alert{border:1.5px solid #FCA5A5;background:#FFF5F5}
 @media(max-width:480px){.form-row{grid-template-columns:1fr}.topo h1{font-size:14px}.grid2{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -235,9 +271,39 @@ function badgeTipo(tipo){
   return '';
 }
 
+
+function pizzaSVG(slices, size){
+  // slices = [{val, color, label}]
+  const total = slices.reduce((a,c)=>a+c.val,0);
+  if(!total) return '<svg width="'+size+'" height="'+size+'"></svg>';
+  const cx=size/2, cy=size/2, r=size/2-4;
+  let angle=-Math.PI/2, paths='';
+  slices.forEach(s=>{
+    if(!s.val) return;
+    const sweep=(s.val/total)*2*Math.PI;
+    const x1=cx+r*Math.cos(angle), y1=cy+r*Math.sin(angle);
+    const x2=cx+r*Math.cos(angle+sweep), y2=cy+r*Math.sin(angle+sweep);
+    const large=sweep>Math.PI?1:0;
+    paths+=`<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${s.color}" stroke="#FFF9F0" stroke-width="2"/>`;
+    angle+=sweep;
+  });
+  return `<svg class="pizza-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}</svg>`;
+}
 function renderDash(){
   const s=calc();
   const pctPrato=s.grupos>0?Math.round(s.comPrato/s.grupos*100):0;
+  const pizzaConv=pizzaSVG([
+    {val:s.adultos,color:'#E67E22',label:'Adultos'},
+    {val:s.cri,color:'#8E44AD',label:'Crianças'}
+  ],110);
+  const pizzaPratos=pizzaSVG([
+    {val:s.sal,color:'#E67E22',label:'Salgado'},
+    {val:s.doc,color:'#D4537E',label:'Doce'},
+    {val:s.mis,color:'#7F77DD',label:'Misto'},
+    {val:s.semPrato,color:'#E0D0B8',label:'Sem prato'}
+  ],110);
+  const totConv=s.adultos+s.cri||1;
+  const totPrat=s.sal+s.doc+s.mis+s.semPrato||1;
   document.getElementById('pg-dash').innerHTML=`
     <div class="grid2">
       <div class="kpi verm"><div class="kl">Total de pessoas</div><div class="kv">${s.tot}</div><div class="ks">confirmados</div></div>
@@ -252,30 +318,36 @@ function renderDash(){
     </div>
     <div class="sec">Chopp</div>
     <div class="grid2">
-      <div class="kpi azul"><div class="kl">Pessoas no chopp</div><div class="kv">${s.totalChopp}</div><div class="ks">${s.gruposChopp} grupos</div></div>
+      <div class="kpi azul"><div class="kl">Pessoas no rateio do chopp</div><div class="kv">${s.totalChopp}</div><div class="ks">${s.gruposChopp} grupos</div></div>
       <div class="kpi larj"><div class="kl">Fora do chopp</div><div class="kv">${s.adultos-s.totalChopp}</div><div class="ks">adultos</div></div>
     </div>
-    <div class="sec">Pratos</div>
+    <div class="sec">Convidados &amp; Pratos</div>
+    <div class="pizza-wrap">
+      <div class="pizza-card">
+        <div class="pc-titulo">Visão de convidados</div>
+        ${pizzaConv}
+        <div class="pizza-leg">
+          <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#E67E22"></div><span>Adultos</span></div><span class="pizza-leg-pct">${s.adultos} (${Math.round(s.adultos/totConv*100)}%)</span></div>
+          <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#8E44AD"></div><span>Crianças</span></div><span class="pizza-leg-pct">${s.cri} (${Math.round(s.cri/totConv*100)}%)</span></div>
+        </div>
+      </div>
+      <div class="pizza-card">
+        <div class="pc-titulo">Mesa do arraiá</div>
+        ${pizzaPratos}
+        <div class="pizza-leg">
+          <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#E67E22"></div><span>Salgado</span></div><span class="pizza-leg-pct">${s.sal} (${Math.round(s.sal/totPrat*100)}%)</span></div>
+          <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#D4537E"></div><span>Doce</span></div><span class="pizza-leg-pct">${s.doc} (${Math.round(s.doc/totPrat*100)}%)</span></div>
+          <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#7F77DD"></div><span>Misto</span></div><span class="pizza-leg-pct">${s.mis} (${Math.round(s.mis/totPrat*100)}%)</span></div>
+          <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#E0D0B8"></div><span>Sem prato</span></div><span class="pizza-leg-pct">${s.semPrato} (${Math.round(s.semPrato/totPrat*100)}%)</span></div>
+        </div>
+      </div>
+    </div>
     <div class="grid2">
       <div class="kpi verd"><div class="kl">Com prato</div><div class="kv">${s.comPrato}</div><div class="ks">${pctPrato}% dos grupos</div></div>
       <div class="kpi verm"><div class="kl">Sem prato</div><div class="kv">${s.semPrato}</div><div class="ks">aguardando</div></div>
     </div>
     ${s.semPrato>0?`<div class="alerta"><i class="ti ti-alert-triangle"></i>${s.semPrato} grupo${s.semPrato>1?'s':''} ainda sem prato confirmado</div>`:''}
-    <div class="card">
-      <div style="font-size:11px;color:#6B4226;margin-bottom:8px;font-weight:500">Distribuição dos pratos</div>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">
-        <div class="legend-item"><div class="leg-cor" style="background:#E67E22"></div>Salgado (${s.sal})</div>
-        <div class="legend-item"><div class="leg-cor" style="background:#D4537E"></div>Doce (${s.doc})</div>
-        <div class="legend-item"><div class="leg-cor" style="background:#7F77DD"></div>Misto (${s.mis})</div>
-        <div class="legend-item"><div class="leg-cor" style="background:#DDD;border:1px solid #CCC"></div>Sem prato (${s.semPrato})</div>
-      </div>
-      <div class="barra-seg">
-        ${s.sal>0?`<div class="seg" style="flex:${s.sal};background:#E67E22"></div>`:''}
-        ${s.doc>0?`<div class="seg" style="flex:${s.doc};background:#D4537E"></div>`:''}
-        ${s.mis>0?`<div class="seg" style="flex:${s.mis};background:#7F77DD"></div>`:''}
-        ${s.semPrato>0?`<div class="seg" style="flex:${s.semPrato};background:#E0D0B8"></div>`:''}
-      </div>
-    </div>`;
+  `;
 }
 
 function renderLista(){
@@ -507,6 +579,7 @@ function renderPub(){
   const pctC=s.tot>0?Math.round(s.cri/s.tot*100):0;
   const total=s.sal+s.doc+s.mis||1;
   const pratosPub=[...lista.filter(d=>d.prato)].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const listaConf=[...lista].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   document.getElementById('pg-pub').innerHTML=`
     <div id="pub-captura">
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;padding:10px;background:#fff;border-radius:12px;border:1px solid #F0E0C8">
@@ -523,62 +596,83 @@ function renderPub(){
           <div style="font-size:11px;color:#6B4226">Felix &amp; Warley · 5ª edição · 2026</div>
         </div>
       </div>
-      <div class="timer-box">
-        <div class="timer-dias">${dias}</div>
-        <div class="timer-label">dias para o nosso Arraiá!</div>
-        <div class="timer-data">04 de julho de 2026 · a partir das 15h</div>
-        <div class="timer-sub">${s.tot} pessoas confirmadas · vem aí!</div>
+      <div class="timer-card">
+        <div class="timer-flag">
+          <span style="background:#C0392B"></span><span style="background:#F39C12"></span>
+          <span style="background:#27AE60"></span><span style="background:#2980B9"></span>
+          <span style="background:#8E44AD"></span><span style="background:#C0392B"></span>
+          <span style="background:#F39C12"></span><span style="background:#27AE60"></span>
+        </div>
+        <div class="timer-num-wrap">
+          <div class="timer-num">${dias}</div>
+        </div>
+        <div class="timer-txt">dias para o nosso Arraiá!</div>
+        <div class="timer-dt">04 de julho de 2026 · a partir das 15h</div>
+        <div style="margin-top:10px;position:relative;z-index:1">
+          <div class="timer-pessoas">
+            <i class="ti ti-users"></i>
+            <span>${s.tot} pessoas confirmadas</span>
+          </div>
+        </div>
+        <div class="timer-flag" style="margin-top:10px;margin-bottom:0">
+          <span style="background:#C0392B"></span><span style="background:#F39C12"></span>
+          <span style="background:#27AE60"></span><span style="background:#2980B9"></span>
+          <span style="background:#8E44AD"></span><span style="background:#C0392B"></span>
+          <span style="background:#F39C12"></span><span style="background:#27AE60"></span>
+        </div>
       </div>
       <div class="grid2" style="margin-bottom:10px">
         <div class="kpi verm"><div class="kl">Pessoas confirmadas</div><div class="kv">${s.tot}</div></div>
-        <div class="kpi roxo"><div class="kl">Grupos confirmados</div><div class="kv">${s.grupos}</div></div>
+        <div class="kpi azul"><div class="kl">No rateio do chopp</div><div class="kv">${s.totalChopp}</div></div>
         <div class="kpi amar"><div class="kl">Adultos</div><div class="kv">${s.adultos}</div></div>
         <div class="kpi verd"><div class="kl">Crianças</div><div class="kv">${s.cri}</div></div>
       </div>
-      <div class="kpi azul" style="margin-bottom:10px;text-align:center">
-        <div class="kl">Pessoas no rateio do chopp</div>
-        <div class="kv" style="font-size:28px">${s.totalChopp}</div>
-        <div class="ks">${s.gruposChopp} grupos confirmaram</div>
-      </div>
-      <div class="card">
-        <div style="font-size:12px;font-weight:600;margin-bottom:10px">Composição dos convidados</div>
-        <div class="dp-row"><div class="dp-label">Adultos</div><div class="dp-val">${s.adultos} (${pctA}%)</div></div>
-        <div class="dp-bar"><div class="dp-fill" style="width:${pctA}%;background:#8B6914"></div></div>
-        <div class="dp-row"><div class="dp-label">Crianças</div><div class="dp-val">${s.cri} (${pctC}%)</div></div>
-        <div class="dp-bar"><div class="dp-fill" style="width:${pctC}%;background:#3B6D11"></div></div>
-      </div>
-      <div class="card">
-        <div style="font-size:12px;font-weight:600;margin-bottom:10px">Mesa do arraiá</div>
-        <div class="dp-row"><div class="dp-label">Pratos salgados</div><div class="dp-val">${s.sal} (${Math.round(s.sal/total*100)}%)</div></div>
-        <div class="dp-bar"><div class="dp-fill" style="width:${Math.round(s.sal/total*100)}%;background:#E67E22"></div></div>
-        <div class="dp-row"><div class="dp-label">Pratos doces</div><div class="dp-val">${s.doc} (${Math.round(s.doc/total*100)}%)</div></div>
-        <div class="dp-bar"><div class="dp-fill" style="width:${Math.round(s.doc/total*100)}%;background:#D4537E"></div></div>
-        <div class="dp-row"><div class="dp-label">Pratos mistos</div><div class="dp-val">${s.mis} (${Math.round(s.mis/total*100)}%)</div></div>
-        <div class="dp-bar"><div class="dp-fill" style="width:${Math.round(s.mis/total*100)}%;background:#7F77DD"></div></div>
-      </div>
-      <div class="card">
-        <div style="font-size:12px;font-weight:600;margin-bottom:10px">Pratos confirmados (ordem alfabética)</div>
-        ${pratosPub.length===0?'<div class="empty">Nenhum prato confirmado ainda</div>':
-          pratosPub.map(d=>{
-            let cor='#BDC3C7';
-            if(d.tipo==='SALGADO') cor='#E67E22';
-            else if(d.tipo==='DOCE') cor='#D4537E';
-            else if(d.tipo==='MISTO') cor='#7F77DD';
-            return`<div class="prato-pub-item">
-              <div style="width:4px;height:32px;border-radius:2px;background:${cor};flex-shrink:0"></div>
-              <div style="flex:1;min-width:0">
-                <div class="prato-pub-nome">${d.prato}</div>
-                <div class="prato-pub-quem">${d.nome}</div>
-              </div>
-              ${badgeTipo(d.tipo)}
-            </div>`;
-          }).join('')}
+      <div class="pizza-wrap">
+        <div class="pizza-card">
+          <div class="pc-titulo">Visão de convidados</div>
+          ${pizzaSVG([{val:s.adultos,color:'#E67E22'},{val:s.cri,color:'#8E44AD'}],100)}
+          <div class="pizza-leg">
+            <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#E67E22"></div><span>Adultos</span></div><span class="pizza-leg-pct">${s.adultos} (${pctA}%)</span></div>
+            <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#8E44AD"></div><span>Crianças</span></div><span class="pizza-leg-pct">${s.cri} (${pctC}%)</span></div>
+          </div>
+        </div>
+        <div class="pizza-card">
+          <div class="pc-titulo">Mesa do arraiá</div>
+          ${pizzaSVG([{val:s.sal,color:'#E67E22'},{val:s.doc,color:'#D4537E'},{val:s.mis,color:'#7F77DD'}],100)}
+          <div class="pizza-leg">
+            <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#E67E22"></div><span>Salgado</span></div><span class="pizza-leg-pct">${s.sal} (${Math.round(s.sal/total*100)}%)</span></div>
+            <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#D4537E"></div><span>Doce</span></div><span class="pizza-leg-pct">${s.doc} (${Math.round(s.doc/total*100)}%)</span></div>
+            <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#7F77DD"></div><span>Misto</span></div><span class="pizza-leg-pct">${s.mis} (${Math.round(s.mis/total*100)}%)</span></div>
+          </div>
+        </div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-    <button class="btn-screenshot" onclick="capturarImagem()"><i class="ti ti-camera" style="font-size:16px"></i>Salvar para WhatsApp</button>
-    <button class="btn-screenshot" style="background:#185FA5" onclick="baixarLogo()"><i class="ti ti-download" style="font-size:16px"></i>Baixar logo</button>
-  </div>`;
+    <div id="pub-captura2" style="background:#FFF9F0;padding:0 0 4px">
+      <div class="card" style="margin:0 0 6px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:10px">Lista de Confirmação (Pratos e Pagamento)</div>
+        ${(()=>{
+            const CORES=['#C0392B','#E67E22','#F39C12','#27AE60','#16A085','#2980B9','#8E44AD','#D35400'];
+            return listaConf.map((d,idx)=>{
+              const cor=CORES[idx%8];
+              const temPrato=!!d.prato;
+              const initials=d.nome.trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
+              let bprat=temPrato?'':`<span class="badge-prato-n">Prato Pendente</span>`;
+              if(d.tipo==='SALGADO') bprat=`<span class="badge-prato-s">Salgado</span>`;
+              else if(d.tipo==='DOCE') bprat=`<span class="badge-prato-d">Doce</span>`;
+              else if(d.tipo==='MISTO') bprat=`<span class="badge-prato-m">Misto</span>`;
+              const choppBadge=d.chopp>0?(d.choppPago?`<span class="badge-chopp-ok">Chopp - OK</span>`:`<span class="badge-chopp-no">Chopp Pendente</span>`):'';
+              const alertClass=!temPrato?'sem-prato-alert':'';
+              const pratotxt=d.prato||'⚠ Prato não confirmado';
+              const pgBadge=d.pg?`<span class="badge-pg-ok">Pagamento - OK</span>`:`<span class="badge-pg-no">Pagamento Pendente</span>`;
+              return `<div class="conf-item ${alertClass}"><div class="conf-av" style="background:${cor}22;color:${cor}">${initials}</div><div class="conf-info"><div class="conf-nome">${d.nome}</div><div class="conf-prato">${pratotxt}</div></div><div class="conf-badges">${pgBadge}${bprat}${choppBadge}</div></div>`;
+            }).join('');
+          })()}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+      <button class="btn-screenshot" onclick="capturarImg1()"><i class="ti ti-camera" style="font-size:16px"></i>Imagem 1 · Resumo (WhatsApp)</button>
+      <button class="btn-screenshot" style="background:#534AB7" onclick="capturarImg2()"><i class="ti ti-camera" style="font-size:16px"></i>Imagem 2 · Lista de confirmação</button>
+    </div>`;
 }
 
 function baixarLogo(){
@@ -615,15 +709,26 @@ function baixarLogo(){
   URL.revokeObjectURL(url);
   toast('Logo baixado!');
 }
-function capturarImagem(){
+function capturarImg1(){
   const el=document.getElementById('pub-captura');
-  toast('Gerando imagem...');
+  toast('Gerando imagem 1...');
   html2canvas(el,{scale:2,backgroundColor:'#FFF9F0',useCORS:true}).then(canvas=>{
     const link=document.createElement('a');
-    link.download='arraia2026-para-todos.png';
+    link.download='arraia2026-resumo.png';
     link.href=canvas.toDataURL('image/png');
     link.click();
-    toast('Imagem salva!');
+    toast('Imagem 1 salva!');
+  }).catch(()=>toast('Erro ao gerar imagem'));
+}
+function capturarImg2(){
+  const el=document.getElementById('pub-captura2');
+  toast('Gerando imagem 2...');
+  html2canvas(el,{scale:2,backgroundColor:'#FFF9F0',useCORS:true}).then(canvas=>{
+    const link=document.createElement('a');
+    link.download='arraia2026-confirmacao.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    toast('Imagem 2 salva!');
   }).catch(()=>toast('Erro ao gerar imagem'));
 }
 
