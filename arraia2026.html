@@ -322,7 +322,7 @@ const SEED=[
   {id:41,nome:"Yasmin e Kevin (Postall)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Bolo de Paçoca Recheado",tipo:"DOCE",chopp:0,choppPago:false,cel:""}
 ];
 
-const KEY='arraia2026v2';
+const KEY='arraia2026v3';
 function carregar(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):SEED.map(d=>({...d,chopp:d.chopp||0}))}catch(e){return SEED.map(d=>({...d,chopp:0,choppPago:false,cel:""}))}}
 function salvarLS(){try{localStorage.setItem(KEY,JSON.stringify(lista))}catch(e){}}
 
@@ -475,21 +475,15 @@ function renderLista(){
         const cor=corAv(idx);
         const pgB=d.pg&&d.contrib>0?`<span class="badge bp">PG ${fmt(d.contrib)}</span>`:(d.pg?'<span class="badge bp">PG</span>':'');
         const chB=d.chopp>0?`<span class="badge bchopp">${d.chopp} no chopp</span>${d.choppPago?'<span class="badge bp" style="margin-left:2px">Pago</span>':''}`:'';
-        return`<div class="row-item">
-          <div class="av" style="background:${cor}22;color:${cor}">${ini(d.nome)}</div>
-          <div class="ri-info">
-            <div class="ri-nome">${d.nome}</div>
-            <div class="ri-det">${d.pessoas} pessoa${d.pessoas>1?'s':''}${d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):''}${d.prato?' · '+d.prato:''}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">
-            ${pgB}${d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>'}${chB}
-          </div>
-          <div class="ri-acoes">
-            <button class="btn-ic" onclick="abrirEdit(${d.id})" title="Editar"><i class="ti ti-edit"></i></button>
-            <button class="btn-ic del" onclick="excluir(${d.id})" title="Excluir"><i class="ti ti-trash"></i></button>
-          </div>
-        </div>`;
-      }).join('')}`;
+        const isMyRow=modoAtual==='guest'&&guestId===d.id;
+        const rowStyle=isMyRow?'border:1.5px solid #F39C12;background:#FFFBF0;':'';
+        const rowAcoes=modoAtual==='org'
+          ?('<button class="btn-ic" onclick="abrirEdit('+d.id+')" title="Editar"><i class="ti ti-edit"></i></button>'+'<button class="btn-ic del" onclick="excluir('+d.id+')" title="Excluir"><i class="ti ti-trash"></i></button>')
+          :modoAtual==='guest'&&guestId===d.id
+          ?'<button class="btn-ic" style="background:#F39C1222;border-color:#F39C12;color:#7A5C10" onclick="editarComoConvidado()" title="Editar minha presença"><i class="ti ti-pencil"></i></button>'
+          :'';
+        return '<div class="row-item" style="'+rowStyle+'"><div class="av" style="background:'+cor+'22;color:'+cor+'">'+ini(d.nome)+'</div><div class="ri-info"><div class="ri-nome">'+d.nome+'</div><div class="ri-det">'+d.pessoas+' pessoa'+(d.pessoas>1?'s':'')+(d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):'')+(d.prato?' · '+d.prato:'')+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">'+pgB+(d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>')+chB+'</div><div class="ri-acoes">'+rowAcoes+'</div></div>';
+            }).join('')}`;
 }
 
 function setFiltro(f){filtro=f;renderLista()}
@@ -968,7 +962,7 @@ setInterval(tickTimer,1000);
 
 // ══════ FASE 2 ══════
 const ORG_SENHA = 'Fe@2026';
-const KEY_PEND = 'arraia2026_pendencias';
+const KEY_PEND = 'arraia2026v3_pendencias';
 const KEY_MODE = 'arraia2026_mode';
 let modoAtual = 'pub'; // 'org' | 'guest'
 let guestId = null;
@@ -1013,11 +1007,11 @@ function loginGuest(){
   if(!found){document.getElementById('guest-erro').style.display='block';return;}
   guestId=found.id;
   fecharScreenGuest();
-  ativarModoConvidado(found);
+  ativarModoConvidado(found, window._guestRedirectEdit);
+  window._guestRedirectEdit=false;
 }
-function ativarModoConvidado(convidado){
+function ativarModoConvidado(convidado, abrirForm){
   modoAtual='guest';
-  // esconder nav principal, mostrar apenas pub + guest + sugestões
   document.querySelectorAll('.nav-btn').forEach(b=>{
     if(!b.dataset.pub && !b.dataset.guest) b.style.display='none';
   });
@@ -1026,6 +1020,12 @@ function ativarModoConvidado(convidado){
   document.getElementById('nav-guest-bar').style.display='flex';
   document.getElementById('guest-bar-nome').textContent='Olá, ' + convidado.nome.split('+')[0].trim() + '!';
   ir('guest');
+  if(abrirForm){
+    setTimeout(()=>{
+      const w=document.getElementById('guest-form-wrap');
+      if(w){w.classList.add('aberto');w.scrollIntoView({behavior:'smooth',block:'start'});}
+    },150);
+  }
 }
 function sairModoConvidado(){
   modoAtual='pub';
@@ -1105,6 +1105,19 @@ function renderGuest(abrirForm){
       </div>
     </div>`;
   if(abrirForm){const w=document.getElementById('guest-form-wrap');if(w){w.classList.add('aberto');setTimeout(()=>w.scrollIntoView({behavior:'smooth',block:'start'}),50);}}
+}
+function editarComoConvidado(){
+  if(modoAtual==='guest'&&guestId){
+    ir('guest');
+    setTimeout(()=>{
+      const w=document.getElementById('guest-form-wrap');
+      if(w){w.classList.add('aberto');w.scrollIntoView({behavior:'smooth',block:'start'});}
+    },100);
+    return;
+  }
+  // não logado — abrir tela de celular com flag para redirecionar após login
+  window._guestRedirectEdit=true;
+  abrirScreenGuest();
 }
 function toggleGuestForm(){
   const w=document.getElementById('guest-form-wrap');
