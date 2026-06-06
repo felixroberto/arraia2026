@@ -277,21 +277,33 @@ function badgeTipo(tipo){
 
 
 function pizzaSVG(slices, size){
-  // slices = [{val, color, label}]
-  const total = slices.reduce((a,c)=>a+c.val,0);
-  if(!total) return '<svg width="'+size+'" height="'+size+'"></svg>';
-  const cx=size/2, cy=size/2, r=size/2-4;
-  let angle=-Math.PI/2, paths='';
-  slices.forEach(s=>{
-    if(!s.val) return;
-    const sweep=(s.val/total)*2*Math.PI;
-    const x1=cx+r*Math.cos(angle), y1=cy+r*Math.sin(angle);
-    const x2=cx+r*Math.cos(angle+sweep), y2=cy+r*Math.sin(angle+sweep);
-    const large=sweep>Math.PI?1:0;
-    paths+=`<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${s.color}" stroke="#FFF9F0" stroke-width="2"/>`;
-    angle+=sweep;
-  });
-  return `<svg class="pizza-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}</svg>`;
+  const id='pz'+Math.random().toString(36).slice(2,8);
+  const total=slices.reduce((a,c)=>a+c.val,0);
+  const html='<canvas id="'+id+'" width="'+(size*2)+'" height="'+(size*2)+'" style="width:'+size+'px;height:'+size+'px;display:block;margin:0 auto 8px"></canvas>';
+  setTimeout(()=>{
+    const cv=document.getElementById(id);
+    if(!cv) return;
+    const ctx=cv.getContext('2d');
+    const s2=size*2, cx=s2/2, cy=s2/2, r=s2/2-8;
+    ctx.clearRect(0,0,s2,s2);
+    if(!total){ctx.fillStyle='#EDE0CC';ctx.beginPath();ctx.arc(cx,cy,r,0,2*Math.PI);ctx.fill();return;}
+    let angle=-Math.PI/2;
+    slices.forEach(sl=>{
+      if(!sl.val) return;
+      const sweep=(sl.val/total)*2*Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,angle,angle+sweep);
+      ctx.closePath();
+      ctx.fillStyle=sl.color;
+      ctx.fill();
+      ctx.strokeStyle='#FFF9F0';
+      ctx.lineWidth=3;
+      ctx.stroke();
+      angle+=sweep;
+    });
+  },50);
+  return html;
 }
 function renderDash(){
   const s=calc();
@@ -745,26 +757,30 @@ function baixarLogo(){
   toast('Logo baixado!');
 }
 function capturarImg1(){
-  const el=document.getElementById('pub-captura');
-  toast('Gerando imagem 1...');
-  html2canvas(el,{scale:2,backgroundColor:'#FFF9F0',useCORS:true}).then(canvas=>{
-    const link=document.createElement('a');
-    link.download='arraia2026-resumo.png';
-    link.href=canvas.toDataURL('image/png');
-    link.click();
-    toast('Imagem 1 salva!');
-  }).catch(()=>toast('Erro ao gerar imagem'));
+  toast('Gerando imagem...');
+  setTimeout(()=>{
+    const el=document.getElementById('pub-captura');
+    html2canvas(el,{scale:2,backgroundColor:'#FFF9F0',useCORS:true,allowTaint:true,logging:false}).then(canvas=>{
+      const link=document.createElement('a');
+      link.download='arraia2026-resumo.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+      toast('Imagem salva!');
+    }).catch(()=>toast('Erro ao gerar imagem'));
+  },300);
 }
 function capturarImg2(){
-  const el=document.getElementById('pub-captura2');
-  toast('Gerando imagem 2...');
-  html2canvas(el,{scale:2,backgroundColor:'#FFF9F0',useCORS:true}).then(canvas=>{
-    const link=document.createElement('a');
-    link.download='arraia2026-confirmacao.png';
-    link.href=canvas.toDataURL('image/png');
-    link.click();
-    toast('Imagem 2 salva!');
-  }).catch(()=>toast('Erro ao gerar imagem'));
+  toast('Gerando imagem...');
+  setTimeout(()=>{
+    const el=document.getElementById('pub-captura2');
+    html2canvas(el,{scale:2,backgroundColor:'#FFF9F0',useCORS:true,allowTaint:true,logging:false}).then(canvas=>{
+      const link=document.createElement('a');
+      link.download='arraia2026-confirmacao.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+      toast('Imagem 2 salva!');
+    }).catch(()=>toast('Erro ao gerar imagem'));
+  },300);
 }
 
 function tickTimer(){
