@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arraiá dos Amigos · Felix & Warley 2026</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Sans 3',sans-serif;background:#FFF9F0;color:#2C1A0E;font-size:14px;min-height:100vh}
+.bandeira{height:7px;background:repeating-linear-gradient(90deg,#C0392B 0,#C0392B 24px,#F39C12 24px,#F39C12 48px,#27AE60 48px,#27AE60 72px,#2980B9 72px,#2980B9 96px,#8E44AD 96px,#8E44AD 120px)}
+.topo{background:#7D1C0A;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.topo-left{display:flex;align-items:center;gap:12px}
+.topo-icon{font-size:26px;color:#F39C12}
+.topo h1{color:#fff;font-family:'Lora',serif;font-size:16px;font-weight:600;line-height:1.2}
+.topo p{color:rgba(255,255,255,0.65);font-size:11px;margin-top:2px}
+.edicao{background:rgba(243,156,18,0.85);color:#4A2800;font-size:10px;font-weight:600;padding:3px 10px;border-radius:10px;letter-spacing:.5px;white-space:nowrap}
+.nav{display:flex;background:#2C1A0E;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{flex:1;min-width:68px;padding:10px 6px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;font-family:inherit}
+.nav-btn:hover{color:rgba(255,255,255,.85)}
+.nav-btn.on{color:#F39C12;border-bottom-color:#F39C12;background:rgba(243,156,18,.07)}
+.nav-btn i{display:block;font-size:18px;margin-bottom:2px}
+.pg{display:none;padding:14px 16px;max-width:680px;margin:0 auto}
+.pg.on{display:block}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid #F0E0C8;border-radius:10px;padding:12px 14px}
+.kpi .kl{font-size:10px;color:#6B4226;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.kpi .kv{font-size:24px;font-weight:600;font-family:'Lora',serif;line-height:1}
+.kpi .ks{font-size:10px;color:#999;margin-top:2px}
+.kpi.verm .kv{color:#B5290F}.kpi.amar .kv{color:#854F0B}.kpi.verd .kv{color:#3B6D11}.kpi.roxo .kv{color:#534AB7}.kpi.azul .kv{color:#185FA5}
+.sec{font-size:10px;font-weight:600;color:#6B4226;text-transform:uppercase;letter-spacing:.7px;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:.5px;background:#E8D5B8}
+.card{background:#fff;border:1px solid #F0E0C8;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.row-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#fff;border:1px solid #F0E0C8;border-radius:8px;margin-bottom:6px}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.ri-info{flex:1;min-width:0}
+.ri-nome{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2C1A0E}
+.ri-det{font-size:11px;color:#6B4226;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-acoes{display:flex;gap:4px;flex-shrink:0}
+.btn-ic{width:30px;height:30px;border-radius:8px;border:1px solid #E0C9A8;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B4226;font-size:15px;transition:all .15s}
+.btn-ic:hover{background:#FFF3E0}
+.btn-ic.del:hover{color:#A32D2D;border-color:#A32D2D}
+.badge{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500;flex-shrink:0;white-space:nowrap}
+.bs{background:#FEF3C7;color:#633806}
+.bd{background:#FCE7F3;color:#72243E}
+.bm{background:#EEEDFE;color:#3C3489}
+.bp{background:#EAF3DE;color:#27500A}
+.bn{background:#F5F5F5;color:#888}
+.bpend{background:#FCEBEB;color:#791F1F}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid #D5B89A;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#2C1A0E;margin-bottom:10px;-webkit-appearance:none}
+input:focus,select:focus{outline:none;border-color:#B5290F;box-shadow:0 0 0 2px rgba(181,41,15,.12)}
+input[type=checkbox]{width:auto;margin-bottom:0;accent-color:#B5290F}
+label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:500}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-prim{width:100%;padding:11px;background:#7D1C0A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;transition:background .15s}
+.btn-prim:hover{background:#9D2210}
+.btn-sec{width:100%;padding:10px;background:transparent;color:#6B4226;border:1px solid #D5B89A;border-radius:8px;font-size:13px;cursor:pointer;margin-top:6px;font-family:inherit;transition:all .15s}
+.btn-sec:hover{background:#FFF3E0}
+.busca-w{position:relative;margin-bottom:10px}
+.busca-w i{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:16px;color:#AAA}
+.busca-w input{padding-left:32px;margin-bottom:0}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.pill{padding:5px 11px;border-radius:12px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid #D5B89A;background:#fff;color:#6B4226;transition:all .15s;font-family:inherit}
+.pill.on{background:#2C1A0E;color:#F39C12;border-color:#2C1A0E}
+.barra-seg{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin-top:8px}
+.seg{height:100%;border-radius:2px;min-width:4px}
+.dp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.dp-label{font-size:12px;color:#6B4226}
+.dp-val{font-size:12px;font-weight:600;color:#2C1A0E}
+.dp-bar{height:6px;background:#EDE0CC;border-radius:3px;overflow:hidden;margin-bottom:10px}
+.dp-fill{height:100%;border-radius:3px}
+.alerta{background:#FEF3C7;border:1px solid #EF9F27;border-radius:8px;padding:10px 14px;font-size:12px;color:#633806;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pub-destaque{text-align:center;background:#7D1C0A;border-radius:14px;padding:20px 16px;margin-bottom:12px}
+.pub-destaque .pn{font-size:48px;font-weight:600;font-family:'Lora',serif;color:#F39C12;line-height:1}
+.pub-destaque .pl{font-size:13px;color:rgba(255,255,255,.75);margin-top:6px}
+.empty{text-align:center;padding:28px;color:#AAA;font-size:13px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#6B4226}
+.leg-cor{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.form-check{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer}
+.form-check span{font-size:12px;color:#6B4226}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2C1A0E;color:#F39C12;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+@media(max-width:480px){
+  .form-row{grid-template-columns:1fr}
+  .topo h1{font-size:14px}
+  .grid2{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="bandeira"></div>
+<div class="topo">
+  <div class="topo-left">
+    <i class="ti ti-confetti topo-icon" aria-hidden="true"></i>
+    <div>
+      <h1>Arraiá dos Amigos · Felix &amp; Warley</h1>
+      <p>Sistema de controle de convidados · 2026</p>
+    </div>
+  </div>
+  <span class="edicao">5ª edição</span>
+</div>
+<div class="nav" id="nav">
+  <button class="nav-btn on" onclick="ir('dash')"><i class="ti ti-layout-dashboard"></i>Painel</button>
+  <button class="nav-btn" onclick="ir('lista')"><i class="ti ti-users"></i>Convidados</button>
+  <button class="nav-btn" onclick="ir('cad')"><i class="ti ti-user-plus"></i>Cadastrar</button>
+  <button class="nav-btn" onclick="ir('pratos')"><i class="ti ti-tools-kitchen-2"></i>Pratos</button>
+  <button class="nav-btn" onclick="ir('pub')"><i class="ti ti-speakerphone"></i>Para todos</button>
+</div>
+
+<div id="pg-dash" class="pg on"></div>
+<div id="pg-lista" class="pg"></div>
+<div id="pg-cad" class="pg"></div>
+<div id="pg-pratos" class="pg"></div>
+<div id="pg-pub" class="pg"></div>
+
+<div class="bandeira" style="margin-top:8px"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CORES=['#C0392B','#E67E22','#F39C12','#27AE60','#16A085','#2980B9','#8E44AD','#D35400','#0F6E56'];
+function corAv(i){return CORES[i%CORES.length]}
+function ini(n){const p=n.trim().split(/\s+/);return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase()}
+function fmt(n){return'R$ '+n.toLocaleString('pt-BR')}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+const SEED=[
+  {id:1,nome:"Adriano + Joel + Aline",pessoas:3,criancas:1,contrib:60,pg:true,prato:"Salsicha com molho + Pão + Salgados",tipo:"SALGADO"},
+  {id:2,nome:"Ana Laura + Júnior + Kauane + Isis e Joaquim",pessoas:3,criancas:2,contrib:20,pg:false,prato:"",tipo:""},
+  {id:3,nome:"Anderson + Natália",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Caldo Verde",tipo:"SALGADO"},
+  {id:4,nome:"Bruno (primo) & Família",pessoas:2,criancas:1,contrib:0,pg:false,prato:"Bolo de Paçoca + Torta Salgada",tipo:"MISTO"},
+  {id:5,nome:"Bruno e Bia (primos Felix)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:6,nome:"Bruno Gobato + Sheila + Pais",pessoas:5,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:7,nome:"Camila (Prima) & Família",pessoas:2,criancas:2,contrib:40,pg:true,prato:"Torta de Franco com Catupiry",tipo:"SALGADO"},
+  {id:8,nome:"Cida, Antônio e Emily",pessoas:3,criancas:0,contrib:60,pg:true,prato:"Bolo de Milho e Paçoquinha",tipo:"DOCE"},
+  {id:9,nome:"Claudia + Tony",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de fubá cremoso e Pinhão",tipo:"MISTO"},
+  {id:10,nome:"Daniela de Lima + Luis + Maria + Felipe + Helaine",pessoas:5,criancas:0,contrib:0,pg:false,prato:"Empadão de Frango com milho e Paçoca de Chocolate",tipo:"MISTO"},
+  {id:11,nome:"Fabio + Bia (Golden Park)",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Caldo de Quenga",tipo:"SALGADO"},
+  {id:12,nome:"Fatima + João + Kinho + Naty",pessoas:4,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:13,nome:"Felipe e Júnior",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de Fubá, Pé de Moça e Pé de Moleque",tipo:"DOCE"},
+  {id:14,nome:"Fernanda e Diogo (CVC)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:15,nome:"Fernando e Van (Wei)",pessoas:4,criancas:2,contrib:40,pg:true,prato:"Torta de Carne Seca + Maçã do Amor",tipo:"MISTO"},
+  {id:16,nome:"Florêncio e Priscila e família (Wei)",pessoas:3,criancas:0,contrib:0,pg:false,prato:"Caldo de Mandioca e brigadeiro de Paçoca",tipo:"MISTO"},
+  {id:17,nome:"Franklin + Layz (Paulo)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:""},
+  {id:18,nome:"Jaqueline Peppe (Bonito) + Tia + Namorado",pessoas:3,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:19,nome:"Juliana Araujo (Bonito)",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:20,nome:"Juliana Cury e Família",pessoas:3,criancas:0,contrib:60,pg:true,prato:"",tipo:""},
+  {id:21,nome:"Karin (Curitiba)",pessoas:1,criancas:0,contrib:0,pg:false,prato:"Pudim de Tapioca",tipo:"DOCE"},
+  {id:22,nome:"Kelen + Leandro (Golden)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Arroz Doce",tipo:"DOCE"},
+  {id:23,nome:"Mãe + Bia",pessoas:2,criancas:0,contrib:0,pg:true,prato:"",tipo:""},
+  {id:24,nome:"Marcia, Antônio e filhos (Postall)",pessoas:5,criancas:0,contrib:100,pg:true,prato:"Salgadinhos",tipo:"SALGADO"},
+  {id:25,nome:"Marcos Carvalho",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:26,nome:"Marlene & Família",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Mini Salgados (Coxinha, bolinho de queijo)",tipo:"SALGADO"},
+  {id:27,nome:"Midiã e Família",pessoas:2,criancas:3,contrib:40,pg:true,prato:"Bolo de Tapioca",tipo:"DOCE"},
+  {id:28,nome:"Naty + Fabiano (Golden Park)",pessoas:2,criancas:0,contrib:0,pg:true,prato:"Chá de amendoim",tipo:"DOCE"},
+  {id:29,nome:"Netinha",pessoas:1,criancas:3,contrib:20,pg:true,prato:"",tipo:""},
+  {id:30,nome:"Pamela + Jefferson + Anny",pessoas:2,criancas:1,contrib:40,pg:true,prato:"Caldo Verde e Curau Zero Lactose",tipo:"MISTO"},
+  {id:31,nome:"Paulo + Lucas",pessoas:2,criancas:0,contrib:0,pg:true,prato:"Saco de Milho Verde",tipo:"SALGADO"},
+  {id:32,nome:"Renato + Luana (CVC)",pessoas:2,criancas:1,contrib:0,pg:true,prato:"Torta de Franco",tipo:"SALGADO"},
+  {id:33,nome:"Robert (primo) e Esposa",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:""},
+  {id:34,nome:"Rosângela e Família",pessoas:4,criancas:0,contrib:80,pg:true,prato:"Doce de Abóbora e Doce de Batata Doce",tipo:"DOCE"},
+  {id:35,nome:"Sarah + Henrique + Lorena",pessoas:2,criancas:1,contrib:40,pg:true,prato:"",tipo:""},
+  {id:36,nome:"Sabrina + Família (CVC)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"Bolo de Pão de Queijo",tipo:"SALGADO"},
+  {id:37,nome:"Silvia + Wagner (Carrefour)",pessoas:2,criancas:1,contrib:0,pg:false,prato:"",tipo:""},
+  {id:38,nome:"Susana + Wesley + Laisa",pessoas:3,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:39,nome:"Vavá",pessoas:1,criancas:0,contrib:0,pg:false,prato:"",tipo:""},
+  {id:40,nome:"Weidna e Karina",pessoas:2,criancas:0,contrib:40,pg:true,prato:"Bolo de Milho",tipo:"DOCE"},
+  {id:41,nome:"Yasmin e Kevin (Postall)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Bolo de Paçoca Recheado",tipo:"DOCE"}
+];
+
+const KEY='arraia2026';
+function carregar(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):[...SEED]}catch(e){return[...SEED]}}
+function salvarLS(){try{localStorage.setItem(KEY,JSON.stringify(lista))}catch(e){}}
+
+let lista=carregar();
+let nextId=Math.max(...lista.map(d=>d.id),99)+1;
+let filtro='todos';
+let editId=null;
+
+function calc(){
+  const tot=lista.reduce((a,c)=>a+c.pessoas,0);
+  const cri=lista.reduce((a,c)=>a+c.criancas,0);
+  const contrib=lista.reduce((a,c)=>a+c.contrib,0);
+  const comPrato=lista.filter(d=>d.prato).length;
+  const sal=lista.filter(d=>d.tipo==='SALGADO'&&d.prato).length;
+  const doc=lista.filter(d=>d.tipo==='DOCE'&&d.prato).length;
+  const mis=lista.filter(d=>d.tipo==='MISTO'&&d.prato).length;
+  const pgQtd=lista.filter(d=>d.pg).length;
+  return{tot,cri,adultos:tot-cri,contrib,comPrato,semPrato:lista.length-comPrato,sal,doc,mis,pgQtd,grupos:lista.length};
+}
+
+function badgeTipo(tipo){
+  if(tipo==='SALGADO') return '<span class="badge bs">Salgado</span>';
+  if(tipo==='DOCE') return '<span class="badge bd">Doce</span>';
+  if(tipo==='MISTO') return '<span class="badge bm">Misto</span>';
+  return '';
+}
+
+function renderDash(){
+  const s=calc();
+  const pctPrato=s.grupos>0?Math.round(s.comPrato/s.grupos*100):0;
+  document.getElementById('pg-dash').innerHTML=`
+    <div class="grid2">
+      <div class="kpi verm"><div class="kl">Total de pessoas</div><div class="kv">${s.tot}</div><div class="ks">confirmados</div></div>
+      <div class="kpi amar"><div class="kl">Adultos</div><div class="kv">${s.adultos}</div><div class="ks">pagantes</div></div>
+      <div class="kpi verd"><div class="kl">Crianças</div><div class="kv">${s.cri}</div><div class="ks">isentos</div></div>
+      <div class="kpi roxo"><div class="kl">Grupos</div><div class="kv">${s.grupos}</div><div class="ks">famílias / turmas</div></div>
+    </div>
+    <div class="sec">Financeiro</div>
+    <div class="grid2">
+      <div class="kpi verd"><div class="kl">Total arrecadado</div><div class="kv">${fmt(s.contrib)}</div><div class="ks">${s.pgQtd} grupos pagando</div></div>
+      <div class="kpi amar"><div class="kl">Média por grupo</div><div class="kv">${s.pgQtd>0?fmt(Math.round(s.contrib/s.pgQtd)):'R$ 0'}</div><div class="ks">entre quem pagou</div></div>
+    </div>
+    <div class="sec">Pratos</div>
+    <div class="grid2">
+      <div class="kpi verd"><div class="kl">Com prato</div><div class="kv">${s.comPrato}</div><div class="ks">${pctPrato}% dos grupos</div></div>
+      <div class="kpi verm"><div class="kl">Sem prato</div><div class="kv">${s.semPrato}</div><div class="ks">aguardando</div></div>
+    </div>
+    ${s.semPrato>0?`<div class="alerta"><i class="ti ti-alert-triangle"></i>${s.semPrato} grupo${s.semPrato>1?'s':''} ainda sem prato confirmado</div>`:''}
+    <div class="card">
+      <div style="font-size:11px;color:#6B4226;margin-bottom:8px;font-weight:500">Distribuição dos pratos</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">
+        <div class="legend-item"><div class="leg-cor" style="background:#E67E22"></div>Salgado (${s.sal})</div>
+        <div class="legend-item"><div class="leg-cor" style="background:#D4537E"></div>Doce (${s.doc})</div>
+        <div class="legend-item"><div class="leg-cor" style="background:#7F77DD"></div>Misto (${s.mis})</div>
+        <div class="legend-item"><div class="leg-cor" style="background:#DDD;border:1px solid #CCC"></div>Sem prato (${s.semPrato})</div>
+      </div>
+      <div class="barra-seg">
+        ${s.sal>0?`<div class="seg" style="flex:${s.sal};background:#E67E22"></div>`:''}
+        ${s.doc>0?`<div class="seg" style="flex:${s.doc};background:#D4537E"></div>`:''}
+        ${s.mis>0?`<div class="seg" style="flex:${s.mis};background:#7F77DD"></div>`:''}
+        ${s.semPrato>0?`<div class="seg" style="flex:${s.semPrato};background:#E0D0B8"></div>`:''}
+      </div>
+    </div>`;
+}
+
+function renderLista(){
+  const busca=document.getElementById('buscaLista')?.value||'';
+  let fl=lista.filter(d=>{
+    const ok=d.nome.toLowerCase().includes(busca.toLowerCase());
+    if(filtro==='com-prato') return ok&&d.prato;
+    if(filtro==='sem-prato') return ok&&!d.prato;
+    if(filtro==='criancas') return ok&&d.criancas>0;
+    if(filtro==='pg') return ok&&d.pg;
+    return ok;
+  });
+  document.getElementById('pg-lista').innerHTML=`
+    <div class="busca-w">
+      <i class="ti ti-search"></i>
+      <input type="text" id="buscaLista" placeholder="Buscar convidado..." value="${busca.replace(/"/g,'&quot;')}" oninput="renderLista()">
+    </div>
+    <div class="pills">
+      <button class="pill ${filtro==='todos'?'on':''}" onclick="setFiltro('todos')">Todos (${lista.length})</button>
+      <button class="pill ${filtro==='com-prato'?'on':''}" onclick="setFiltro('com-prato')">Com prato</button>
+      <button class="pill ${filtro==='sem-prato'?'on':''}" onclick="setFiltro('sem-prato')">Sem prato</button>
+      <button class="pill ${filtro==='criancas'?'on':''}" onclick="setFiltro('criancas')">Com crianças</button>
+      <button class="pill ${filtro==='pg'?'on':''}" onclick="setFiltro('pg')">Pagando</button>
+    </div>
+    ${fl.length===0?'<div class="empty">Nenhum convidado encontrado</div>':
+      fl.map(d=>{
+        const idx=lista.indexOf(d);
+        const cor=corAv(idx);
+        const pgB=d.pg&&d.contrib>0?`<span class="badge bp">PG ${fmt(d.contrib)}</span>`:(d.pg?'<span class="badge bp">PG</span>':'');
+        return`<div class="row-item">
+          <div class="av" style="background:${cor}22;color:${cor}">${ini(d.nome)}</div>
+          <div class="ri-info">
+            <div class="ri-nome">${d.nome}</div>
+            <div class="ri-det">${d.pessoas} pessoa${d.pessoas>1?'s':''}${d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):''}${d.prato?' · '+d.prato:''}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">
+            ${pgB}${d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>'}
+          </div>
+          <div class="ri-acoes">
+            <button class="btn-ic" onclick="abrirEdit(${d.id})" title="Editar"><i class="ti ti-edit"></i></button>
+            <button class="btn-ic del" onclick="excluir(${d.id})" title="Excluir"><i class="ti ti-trash"></i></button>
+          </div>
+        </div>`;
+      }).join('')}`;
+}
+
+function setFiltro(f){filtro=f;renderLista()}
+
+function renderCad(v){
+  v=v||{};
+  document.getElementById('pg-cad').innerHTML=`
+    <div class="card">
+      <div style="font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:#2C1A0E">
+        <i class="ti ti-user-plus" style="color:#B5290F;font-size:18px"></i>
+        ${editId?'Editar convidado':'Novo convidado'}
+      </div>
+      <label>Nome / grupo *</label>
+      <input type="text" id="f-nome" placeholder="Ex: João + Maria + Filhos" value="${(v.nome||'').replace(/"/g,'&quot;')}">
+      <div class="form-row">
+        <div><label>Número de pessoas</label><input type="number" id="f-pessoas" min="1" value="${v.pessoas||1}"></div>
+        <div><label>Crianças (até 12 anos)</label><input type="number" id="f-criancas" min="0" value="${v.criancas||0}"></div>
+      </div>
+      <label>Prato que vai trazer</label>
+      <input type="text" id="f-prato" placeholder="Ex: Bolo de fubá, Caldo verde..." value="${(v.prato||'').replace(/"/g,'&quot;')}">
+      <label>Tipo do prato</label>
+      <select id="f-tipo">
+        <option value="">Selecione</option>
+        <option value="SALGADO" ${(v.tipo||'')==='SALGADO'?'selected':''}>Salgado</option>
+        <option value="DOCE" ${(v.tipo||'')==='DOCE'?'selected':''}>Doce</option>
+        <option value="MISTO" ${(v.tipo||'')==='MISTO'?'selected':''}>Misto (salgado + doce)</option>
+      </select>
+      <label>Contribuição (R$)</label>
+      <input type="number" id="f-contrib" min="0" value="${v.contrib||0}" placeholder="0">
+      <label class="form-check">
+        <input type="checkbox" id="f-pg" ${v.pg?'checked':''}>
+        <span>Confirmou pagamento</span>
+      </label>
+      <button class="btn-prim" onclick="salvarConv()">${editId?'Salvar alterações':'Confirmar convidado'}</button>
+      ${editId?`<button class="btn-sec" onclick="cancelarEdit()">Cancelar</button>`:''}
+    </div>`;
+}
+
+function salvarConv(){
+  const nome=document.getElementById('f-nome').value.trim();
+  if(!nome){alert('Informe o nome do grupo');return}
+  const obj={
+    nome,
+    pessoas:parseInt(document.getElementById('f-pessoas').value)||1,
+    criancas:parseInt(document.getElementById('f-criancas').value)||0,
+    prato:document.getElementById('f-prato').value.trim(),
+    tipo:document.getElementById('f-tipo').value,
+    contrib:parseInt(document.getElementById('f-contrib').value)||0,
+    pg:document.getElementById('f-pg').checked
+  };
+  if(editId){
+    const idx=lista.findIndex(d=>d.id===editId);
+    if(idx>=0) lista[idx]={...lista[idx],...obj};
+    editId=null;
+    toast('Convidado atualizado!');
+  } else {
+    obj.id=nextId++;
+    lista.push(obj);
+    toast('Convidado adicionado!');
+  }
+  salvarLS();
+  renderAll();
+  ir('lista');
+}
+
+function abrirEdit(id){
+  const d=lista.find(x=>x.id===id);
+  if(!d) return;
+  editId=id;
+  renderCad(d);
+  ir('cad');
+}
+
+function cancelarEdit(){editId=null;renderCad();ir('lista')}
+
+function excluir(id){
+  if(!confirm('Excluir este convidado?')) return;
+  lista=lista.filter(d=>d.id!==id);
+  salvarLS();
+  renderAll();
+  renderLista();
+  toast('Convidado removido');
+}
+
+function renderPratos(){
+  const s=calc();
+  const comPrato=lista.filter(d=>d.prato).sort((a,b)=>{const o={SALGADO:0,MISTO:1,DOCE:2,'':3};return(o[a.tipo]||3)-(o[b.tipo]||3)});
+  const semPrato=lista.filter(d=>!d.prato);
+  document.getElementById('pg-pratos').innerHTML=`
+    <div class="grid2">
+      <div class="kpi verm"><div class="kl">Salgados</div><div class="kv">${s.sal}</div></div>
+      <div class="kpi" style=""><div class="kl">Doces</div><div class="kv" style="color:#993556">${s.doc}</div></div>
+      <div class="kpi roxo"><div class="kl">Mistos</div><div class="kv">${s.mis}</div></div>
+      <div class="kpi"><div class="kl">Sem prato</div><div class="kv" style="color:#A32D2D">${s.semPrato}</div></div>
+    </div>
+    <div class="sec">Pratos confirmados (${comPrato.length})</div>
+    ${comPrato.map(d=>{
+      let cor='#BDC3C7';
+      if(d.tipo==='SALGADO') cor='#E67E22';
+      else if(d.tipo==='DOCE') cor='#D4537E';
+      else if(d.tipo==='MISTO') cor='#7F77DD';
+      return`<div class="row-item">
+        <div style="width:5px;height:38px;border-radius:3px;background:${cor};flex-shrink:0"></div>
+        <div class="ri-info"><div class="ri-nome">${d.prato}</div><div class="ri-det">${d.nome}</div></div>
+        ${badgeTipo(d.tipo)}
+      </div>`;
+    }).join('')}
+    ${semPrato.length>0?`
+    <div class="sec">Aguardando prato (${semPrato.length})</div>
+    ${semPrato.map(d=>`<div class="row-item" style="opacity:.65">
+      <div style="width:5px;height:38px;border-radius:3px;background:#DDD;flex-shrink:0"></div>
+      <div class="ri-info"><div class="ri-nome">${d.nome}</div><div class="ri-det">${d.pessoas} pessoa${d.pessoas>1?'s':''}</div></div>
+      <span class="badge bpend">Pendente</span>
+      <button class="btn-ic" onclick="abrirEdit(${d.id})" title="Editar"><i class="ti ti-edit"></i></button>
+    </div>`).join('')}`:''}`;
+}
+
+function renderPub(){
+  const s=calc();
+  const pctA=s.tot>0?Math.round(s.adultos/s.tot*100):0;
+  const pctC=s.tot>0?Math.round(s.criancas/s.tot*100):0;
+  const tot=s.sal+s.doc+s.mis||1;
+  document.getElementById('pg-pub').innerHTML=`
+    <div class="pub-destaque">
+      <div class="pn">${s.tot}</div>
+      <div class="pl">pessoas confirmadas no arraiá!</div>
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="kpi verd"><div class="kl">Grupos confirmados</div><div class="kv">${s.grupos}</div></div>
+      <div class="kpi amar"><div class="kl">Pratos confirmados</div><div class="kv">${s.comPrato}</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:600;margin-bottom:10px">Quem vem ao arraiá</div>
+      <div class="dp-row"><div class="dp-label">Adultos</div><div class="dp-val">${s.adultos} (${pctA}%)</div></div>
+      <div class="dp-bar"><div class="dp-fill" style="width:${pctA}%;background:#B5290F"></div></div>
+      <div class="dp-row"><div class="dp-label">Crianças</div><div class="dp-val">${s.criancas} (${pctC}%)</div></div>
+      <div class="dp-bar"><div class="dp-fill" style="width:${pctC}%;background:#3B6D11"></div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:600;margin-bottom:10px">Mesa do arraiá</div>
+      <div class="dp-row"><div class="dp-label">Pratos salgados</div><div class="dp-val">${s.sal} (${Math.round(s.sal/tot*100)}%)</div></div>
+      <div class="dp-bar"><div class="dp-fill" style="width:${Math.round(s.sal/tot*100)}%;background:#E67E22"></div></div>
+      <div class="dp-row"><div class="dp-label">Pratos doces</div><div class="dp-val">${s.doc} (${Math.round(s.doc/tot*100)}%)</div></div>
+      <div class="dp-bar"><div class="dp-fill" style="width:${Math.round(s.doc/tot*100)}%;background:#D4537E"></div></div>
+      <div class="dp-row"><div class="dp-label">Pratos mistos</div><div class="dp-val">${s.mis} (${Math.round(s.mis/tot*100)}%)</div></div>
+      <div class="dp-bar"><div class="dp-fill" style="width:${Math.round(s.mis/tot*100)}%;background:#7F77DD"></div></div>
+    </div>
+    <div style="text-align:center;padding:8px 0 4px;font-size:11px;color:#AAA">Vista pública · sem informações financeiras</div>`;
+}
+
+function renderAll(){renderDash();renderPratos();renderPub()}
+
+function ir(pg){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+pg).classList.add('on');
+  const m={dash:0,lista:1,cad:2,pratos:3,pub:4};
+  if(m[pg]!==undefined) document.querySelectorAll('.nav-btn')[m[pg]]?.classList.add('on');
+  if(pg==='cad'&&!editId) renderCad();
+  if(pg==='lista') renderLista();
+  if(pg==='dash') renderDash();
+  if(pg==='pratos') renderPratos();
+  if(pg==='pub') renderPub();
+}
+
+renderAll();renderCad();renderLista();
+</script>
+</body>
+</html>
