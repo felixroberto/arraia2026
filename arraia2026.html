@@ -106,22 +106,22 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .stab-chopp.on{background:#185FA5;border-color:#185FA5}
 #pub-captura{background:#FFF9F0;padding:16px}
 
-.timer-card{background:linear-gradient(160deg,#7A5C10 0%,#5C3D08 100%);border-radius:20px;padding:22px 14px 18px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden;border:2px solid rgba(243,156,18,0.3)}
-.timer-bandeiras{display:flex;justify-content:center;gap:0;margin-bottom:14px;position:relative;z-index:2}
-.timer-bandeiras span{width:16px;height:20px;clip-path:polygon(0 0,100% 0,50% 100%);display:inline-block;margin:0 2px}
-.timer-titulo{font-family:'Lora',serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;position:relative;z-index:2}
-.timer-flip-wrap{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin-bottom:10px;position:relative;z-index:2}
-.timer-flip-box{display:flex;flex-direction:column;align-items:center;gap:4px}
-.timer-flip{background:linear-gradient(180deg,#2C1A00 0%,#1A0F00 100%);border-radius:10px;padding:8px 14px;min-width:54px;border:2px solid rgba(243,156,18,0.5);position:relative;overflow:hidden}
+.timer-card{background:linear-gradient(160deg,#7A5C10 0%,#5C3D08 100%);border-radius:20px;padding:18px 10px 16px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden;border:2px solid rgba(243,156,18,0.3)}
+.timer-bandeiras{display:flex;justify-content:center;flex-wrap:wrap;gap:0;margin-bottom:10px;position:relative;z-index:2}
+.timer-bandeiras span{width:14px;height:18px;clip-path:polygon(0 0,100% 0,50% 100%);display:inline-block;margin:0 1px}
+.timer-titulo{font-family:'Lora',serif;font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;position:relative;z-index:2}
+.timer-flip-wrap{display:flex;align-items:flex-end;justify-content:center;gap:3px;margin-bottom:10px;position:relative;z-index:2;flex-wrap:nowrap;width:100%}
+.timer-flip-box{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0}
+.timer-flip{background:linear-gradient(180deg,#2C1A00 0%,#1A0F00 100%);border-radius:8px;padding:6px 4px;width:100%;border:2px solid rgba(243,156,18,0.5);position:relative;overflow:hidden;box-sizing:border-box}
 .timer-flip::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(243,156,18,0.25)}
-.timer-flip-num{font-family:'Lora',serif;font-size:54px;font-weight:700;color:#F39C12;line-height:1;text-shadow:0 0 20px rgba(243,156,18,0.5)}
-.timer-flip-label{font-size:9px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px}
-.timer-flip-sep{font-family:'Lora',serif;font-size:40px;font-weight:700;color:rgba(243,156,18,0.4);line-height:1;margin-bottom:16px}
-.timer-data-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(243,156,18,0.15);border:1px solid rgba(243,156,18,0.35);border-radius:20px;padding:6px 16px;margin-top:6px;position:relative;z-index:2}
-.timer-data-pill span{font-size:12px;color:rgba(255,255,255,0.8);font-weight:500}
-.timer-data-pill i{font-size:14px;color:#F39C12}
-.timer-estrelas{position:absolute;top:12px;right:14px;font-size:18px;color:rgba(243,156,18,0.35);z-index:1;line-height:1.4}
-.timer-estrelas-l{position:absolute;top:12px;left:14px;font-size:18px;color:rgba(243,156,18,0.35);z-index:1;line-height:1.4}
+.timer-flip-num{font-family:'Lora',serif;font-size:clamp(28px,8vw,52px);font-weight:700;color:#F39C12;line-height:1;text-shadow:0 0 16px rgba(243,156,18,0.5)}
+.timer-flip-label{font-size:8px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px}
+.timer-flip-sep{font-family:'Lora',serif;font-size:clamp(20px,5vw,36px);font-weight:700;color:rgba(243,156,18,0.4);line-height:1;margin-bottom:14px;flex-shrink:0;padding:0 1px}
+.timer-data-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(243,156,18,0.15);border:1px solid rgba(243,156,18,0.35);border-radius:20px;padding:5px 12px;margin-top:6px;position:relative;z-index:2;max-width:100%}
+.timer-data-pill span{font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;white-space:nowrap}
+.timer-data-pill i{font-size:13px;color:#F39C12;flex-shrink:0}
+.timer-estrelas{position:absolute;top:10px;right:10px;font-size:14px;color:rgba(243,156,18,0.3);z-index:1;line-height:1.4}
+.timer-estrelas-l{position:absolute;top:10px;left:10px;font-size:14px;color:rgba(243,156,18,0.3);z-index:1;line-height:1.4}
 .pizza-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .pizza-card{background:#fff;border:1px solid #F0E0C8;border-radius:12px;padding:12px 10px;text-align:center}
 .pizza-card .pc-titulo{font-size:10px;font-weight:600;color:#6B4226;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
@@ -179,6 +179,14 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .nav-guest-bar button:hover{background:rgba(255,255,255,.25)}
 .lock-icon{font-size:11px;color:#999;margin-left:4px}
 @media(max-width:480px){.form-row{grid-template-columns:1fr}.topo h1{font-size:14px}.grid2{grid-template-columns:1fr 1fr}}
+.guest-edit-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:#7A5C10;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:10px;width:100%;justify-content:center}
+.guest-edit-btn:hover{background:#9A7612}
+.guest-form-wrap{display:none;margin-top:10px}
+.guest-form-wrap.aberto{display:block}
+.guest-info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid #F0E0C8}
+.guest-info-row:last-child{border-bottom:none}
+.guest-info-label{font-size:11px;color:#6B4226}
+.guest-info-val{font-size:12px;font-weight:600;color:#2C1A0E;text-align:right}
 </style>
 </head>
 <body>
@@ -790,11 +798,11 @@ function renderPub(){
           })()}
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+    ${modoAtual==='org'?`<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
       <button class="btn-screenshot" onclick="capturarImg1()"><i class="ti ti-camera" style="font-size:16px"></i>Imagem 1 · Resumo (WhatsApp)</button>
       <button class="btn-screenshot" style="background:#534AB7" onclick="capturarImg2()"><i class="ti ti-camera" style="font-size:16px"></i>Imagem 2 · Lista de confirmação</button>
       <button class="btn-pdf" onclick="gerarPDF()"><i class="ti ti-file-type-pdf" style="font-size:18px"></i>Baixar PDF completo (Imagem 1 + 2)</button>
-    </div>`;
+    </div>`:''}\n  `;
 }
 
 function baixarLogo(){
@@ -1031,7 +1039,7 @@ function sairModoConvidado(){
 }
 
 // ── TELA DO CONVIDADO ──────────────────────────────────────────
-function renderGuest(){
+function renderGuest(abrirForm){
   const d=lista.find(x=>x.id===guestId);
   if(!d){document.getElementById('pg-guest').innerHTML='<div style="padding:20px;text-align:center;color:#999">Convidado não encontrado</div>';return;}
   const pendencias=carregarPendencias();
@@ -1041,46 +1049,68 @@ function renderGuest(){
   if(d.tipo==='SALGADO') badgePrato='<span class="badge-prato-s">Salgado</span>';
   else if(d.tipo==='DOCE') badgePrato='<span class="badge-prato-d">Doce</span>';
   else if(d.tipo==='MISTO') badgePrato='<span class="badge-prato-m">Misto</span>';
+  const pratoAtual=minhaPend?minhaPend.prato:d.prato;
+  const tipoAtual=minhaPend?minhaPend.tipo:d.tipo;
+  const choppAtual=minhaPend?minhaPend.chopp:(d.chopp||0);
   document.getElementById('pg-guest').innerHTML=`
-    <div style="margin-bottom:10px">
-      <div class="guest-card">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <div class="av" style="width:44px;height:44px;background:${cor}22;color:${cor};font-size:14px">${ini(d.nome)}</div>
-          <div>
-            <div class="guest-card-nome">${d.nome}</div>
-            <div class="guest-card-det">${d.pessoas} pessoa${d.pessoas>1?'s':''} confirmadas${d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):''}</div>
-          </div>
+    <div class="guest-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div class="av" style="width:44px;height:44px;background:${cor}22;color:${cor};font-size:14px">${ini(d.nome)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="guest-card-nome">${d.nome}</div>
+          <div class="guest-card-det">${d.pessoas} pessoa${d.pessoas>1?'s':''} · ${d.criancas?d.criancas+' criança'+(d.criancas>1?'s':'')+' · ':''}confirmado</div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
-          <span class="${d.pg?'badge-pg-ok':'badge-pg-no'}">${d.pg?'Pagamento - OK':'Pagamento Pendente'}</span>
-          ${badgePrato}
-          ${d.prato?`<span style="font-size:10px;color:#6B4226;background:#FFF3E0;padding:2px 7px;border-radius:6px">${d.prato}</span>`:''}
-        </div>
-        ${d.chopp>0?`<div style="font-size:11px;color:#185FA5;margin-bottom:8px"><i class="ti ti-beer" style="font-size:13px;vertical-align:-2px"></i> ${d.chopp} pessoa${d.chopp>1?'s':''} no rateio do chopp</div>`:''}
       </div>
-      ${minhaPend?`<div class="pendencias-bar"><div style="display:flex;align-items:center;gap:8px"><i class="ti ti-clock" style="font-size:16px;color:#92400E"></i><span>Você tem uma alteração aguardando aprovação do organizador</span></div><span class="pendente-badge">Pendente</span></div>`:''}
+      <div class="guest-info-row">
+        <span class="guest-info-label"><i class="ti ti-tools-kitchen-2" style="font-size:12px;vertical-align:-1px"></i> Prato</span>
+        <span class="guest-info-val">${d.prato||'—'} ${badgePrato}</span>
+      </div>
+      <div class="guest-info-row">
+        <span class="guest-info-label"><i class="ti ti-beer" style="font-size:12px;vertical-align:-1px"></i> No chopp</span>
+        <span class="guest-info-val">${d.chopp||0} pessoa${(d.chopp||0)!==1?'s':''}</span>
+      </div>
+      <div class="guest-info-row">
+        <span class="guest-info-label"><i class="ti ti-cash" style="font-size:12px;vertical-align:-1px"></i> Pagamento</span>
+        <span class="${d.pg?'badge-pg-ok':'badge-pg-no'}">${d.pg?'Pagamento - OK':'Pagamento Pendente'}</span>
+      </div>
+      ${minhaPend?`<div style="margin-top:10px;background:#FEF3C7;border-radius:8px;padding:8px 10px;font-size:11px;color:#92400E;display:flex;align-items:center;gap:7px"><i class="ti ti-clock" style="font-size:14px;flex-shrink:0"></i><span>Alteração aguardando aprovação do organizador</span><span class="pendente-badge" style="margin-left:auto">Pendente</span></div>`:''}
+      <button class="guest-edit-btn" onclick="toggleGuestForm()">
+        <i class="ti ti-pencil" style="font-size:15px"></i> Editar minha participação
+      </button>
     </div>
-    <div class="sec">Atualizar minha participação</div>
-    <div class="card">
-      <label>Prato que vou trazer</label>
-      <input type="text" id="g-prato" placeholder="Ex: Bolo de fubá, Caldo verde..." value="${(minhaPend?minhaPend.prato:d.prato)||''}">
-      <label>Tipo do prato</label>
-      <select id="g-tipo">
-        <option value="">Selecione</option>
-        <option value="SALGADO" ${((minhaPend?minhaPend.tipo:d.tipo)||'')==='SALGADO'?'selected':''}>Salgado</option>
-        <option value="DOCE" ${((minhaPend?minhaPend.tipo:d.tipo)||'')==='DOCE'?'selected':''}>Doce</option>
-        <option value="MISTO" ${((minhaPend?minhaPend.tipo:d.tipo)||'')==='MISTO'?'selected':''}>Misto (salgado + doce)</option>
-      </select>
-      <label>Pessoas no rateio do chopp (apenas adultos)</label>
-      <input type="number" id="g-chopp" min="0" value="${minhaPend?minhaPend.chopp:(d.chopp||0)}" placeholder="0">
-      <div style="font-size:11px;color:#6B4226;margin-bottom:10px;display:flex;align-items:flex-start;gap:6px">
-        <i class="ti ti-info-circle" style="font-size:13px;margin-top:1px;flex-shrink:0"></i>
-        <span>Pagamentos e dados pessoais só podem ser atualizados pelo organizador.</span>
+    <div class="guest-form-wrap" id="guest-form-wrap">
+      <div class="card" style="margin-top:10px">
+        <div style="font-size:13px;font-weight:600;color:#7A5C10;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+          <i class="ti ti-pencil" style="font-size:16px"></i> Atualizar minha participação
+        </div>
+        <label>Prato que vou trazer</label>
+        <input type="text" id="g-prato" placeholder="Ex: Bolo de fubá, Caldo verde..." value="${pratoAtual||''}">
+        <label>Tipo do prato</label>
+        <select id="g-tipo">
+          <option value="">Selecione</option>
+          <option value="SALGADO" ${(tipoAtual||'')==='SALGADO'?'selected':''}>Salgado</option>
+          <option value="DOCE" ${(tipoAtual||'')==='DOCE'?'selected':''}>Doce</option>
+          <option value="MISTO" ${(tipoAtual||'')==='MISTO'?'selected':''}>Misto (salgado + doce)</option>
+        </select>
+        <label>Pessoas no rateio do chopp</label>
+        <input type="number" id="g-chopp" min="0" value="${choppAtual}" placeholder="0">
+        <div style="font-size:11px;color:#6B4226;margin-bottom:10px;display:flex;align-items:flex-start;gap:6px">
+          <i class="ti ti-lock" style="font-size:13px;margin-top:1px;flex-shrink:0;color:#999"></i>
+          <span>Pagamentos e dados pessoais são gerenciados pelo organizador.</span>
+        </div>
+        ${minhaPend?'<div style="font-size:11px;color:#92400E;background:#FEF3C7;border-radius:6px;padding:8px 10px;margin-bottom:10px"><i class="ti ti-alert-circle" style="font-size:13px;vertical-align:-2px"></i> Você já tem uma solicitação pendente. Enviar uma nova substituirá a anterior.</div>':''}
+        <button class="btn-prim" onclick="enviarSolicitacao()"><i class="ti ti-send" style="font-size:15px;vertical-align:-2px"></i> Enviar para aprovação</button>
+        <button class="btn-sec" style="margin-top:8px" onclick="ir('sugestoes')"><i class="ti ti-bulb" style="font-size:14px;vertical-align:-2px"></i> Ver sugestões de pratos</button>
+        <button class="btn-sec" style="margin-top:6px" onclick="toggleGuestForm()"><i class="ti ti-x" style="font-size:13px;vertical-align:-2px"></i> Fechar</button>
       </div>
-      ${minhaPend?'<div style="font-size:11px;color:#92400E;background:#FEF3C7;border-radius:6px;padding:8px 10px;margin-bottom:10px"><i class="ti ti-alert-circle" style="font-size:13px;vertical-align:-2px"></i> Você já tem uma solicitação pendente. Enviar uma nova substituirá a anterior.</div>':''}
-      <button class="btn-prim" onclick="enviarSolicitacao()"><i class="ti ti-send" style="font-size:15px;vertical-align:-2px"></i> Enviar para aprovação</button>
-      <button class="btn-sec" style="margin-top:8px" onclick="ir('sugestoes')"><i class="ti ti-bulb" style="font-size:14px;vertical-align:-2px"></i> Ver sugestões de pratos juninos</button>
     </div>`;
+  if(abrirForm){const w=document.getElementById('guest-form-wrap');if(w){w.classList.add('aberto');setTimeout(()=>w.scrollIntoView({behavior:'smooth',block:'start'}),50);}}
+}
+function toggleGuestForm(){
+  const w=document.getElementById('guest-form-wrap');
+  if(!w) return;
+  const aberto=w.classList.toggle('aberto');
+  if(aberto) setTimeout(()=>w.scrollIntoView({behavior:'smooth',block:'start'}),50);
 }
 
 function enviarSolicitacao(){
@@ -1092,8 +1122,8 @@ function enviarSolicitacao(){
   const pendencias=carregarPendencias().filter(p=>!(p.id===guestId&&p.status==='pendente'));
   pendencias.push({id:guestId,nome:d.nome,prato,tipo,chopp,status:'pendente',ts:new Date().toISOString()});
   salvarPendencias(pendencias);
-  toast('Solicitação enviada! Aguardando aprovação.');
-  renderGuest();
+  toast('Solicitação enviada! Aguardando aprovação do organizador.');
+  renderGuest(false);
 }
 
 // ── PAINEL DE PENDÊNCIAS (para o organizador) ───────────────────
