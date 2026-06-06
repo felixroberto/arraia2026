@@ -104,18 +104,22 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .stab-chopp.on{background:#185FA5;border-color:#185FA5}
 #pub-captura{background:#FFF9F0;padding:16px}
 
-.timer-card{background:#7A5C10;border-radius:16px;padding:20px 16px 16px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden}
-.timer-card::before{content:'';position:absolute;top:-20px;left:-20px;width:120px;height:120px;background:rgba(255,255,255,0.05);border-radius:50%}
-.timer-card::after{content:'';position:absolute;bottom:-30px;right:-20px;width:150px;height:150px;background:rgba(0,0,0,0.08);border-radius:50%}
-.timer-flag{display:flex;justify-content:center;gap:4px;margin-bottom:10px}
-.timer-flag span{width:18px;height:14px;border-radius:2px;display:inline-block}
-.timer-num-wrap{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px}
-.timer-num{background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 14px;font-family:'Lora',serif;font-size:52px;font-weight:700;color:#F39C12;line-height:1;position:relative;z-index:1}
-.timer-txt{font-size:14px;color:rgba(255,255,255,0.85);font-weight:500;position:relative;z-index:1;letter-spacing:.3px}
-.timer-dt{font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px;position:relative;z-index:1}
-.timer-pessoas{display:inline-flex;align-items:center;gap:6px;background:rgba(243,156,18,0.2);border:1px solid rgba(243,156,18,0.4);border-radius:20px;padding:5px 14px;margin-top:10px;position:relative;z-index:1}
-.timer-pessoas span{font-size:13px;color:#F39C12;font-weight:600}
-.timer-pessoas i{font-size:15px;color:#F39C12}
+.timer-card{background:linear-gradient(160deg,#7A5C10 0%,#5C3D08 100%);border-radius:20px;padding:22px 14px 18px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden;border:2px solid rgba(243,156,18,0.3)}
+.timer-bandeiras{display:flex;justify-content:center;gap:0;margin-bottom:14px;position:relative;z-index:2}
+.timer-bandeiras span{width:16px;height:20px;clip-path:polygon(0 0,100% 0,50% 100%);display:inline-block;margin:0 2px}
+.timer-titulo{font-family:'Lora',serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;position:relative;z-index:2}
+.timer-flip-wrap{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin-bottom:10px;position:relative;z-index:2}
+.timer-flip-box{display:flex;flex-direction:column;align-items:center;gap:4px}
+.timer-flip{background:linear-gradient(180deg,#2C1A00 0%,#1A0F00 100%);border-radius:10px;padding:8px 14px;min-width:54px;border:2px solid rgba(243,156,18,0.5);position:relative;overflow:hidden}
+.timer-flip::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(243,156,18,0.25)}
+.timer-flip-num{font-family:'Lora',serif;font-size:54px;font-weight:700;color:#F39C12;line-height:1;text-shadow:0 0 20px rgba(243,156,18,0.5)}
+.timer-flip-label{font-size:9px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px}
+.timer-flip-sep{font-family:'Lora',serif;font-size:40px;font-weight:700;color:rgba(243,156,18,0.4);line-height:1;margin-bottom:16px}
+.timer-data-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(243,156,18,0.15);border:1px solid rgba(243,156,18,0.35);border-radius:20px;padding:6px 16px;margin-top:6px;position:relative;z-index:2}
+.timer-data-pill span{font-size:12px;color:rgba(255,255,255,0.8);font-weight:500}
+.timer-data-pill i{font-size:14px;color:#F39C12}
+.timer-estrelas{position:absolute;top:12px;right:14px;font-size:18px;color:rgba(243,156,18,0.35);z-index:1;line-height:1.4}
+.timer-estrelas-l{position:absolute;top:12px;left:14px;font-size:18px;color:rgba(243,156,18,0.35);z-index:1;line-height:1.4}
 .pizza-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .pizza-card{background:#fff;border:1px solid #F0E0C8;border-radius:12px;padding:12px 10px;text-align:center}
 .pizza-card .pc-titulo{font-size:10px;font-weight:600;color:#6B4226;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
@@ -592,35 +596,66 @@ function renderPub(){
           <rect x="2" y="38" width="40" height="4" rx="2" fill="#C0392B"/>
         </svg>
         <div>
-          <div style="font-family:Georgia,serif;font-size:15px;font-weight:700;color:#7A5C10">Arraiá dos Amigos</div>
+          <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#7A5C10;line-height:1.2">Arraiá dos Amigos</div>
           <div style="font-size:11px;color:#6B4226">Felix &amp; Warley · 5ª edição · 2026</div>
         </div>
       </div>
       <div class="timer-card">
-        <div class="timer-flag">
-          <span style="background:#C0392B"></span><span style="background:#F39C12"></span>
-          <span style="background:#27AE60"></span><span style="background:#2980B9"></span>
-          <span style="background:#8E44AD"></span><span style="background:#C0392B"></span>
-          <span style="background:#F39C12"></span><span style="background:#27AE60"></span>
+        <div class="timer-estrelas-l">★<br>✦<br>★</div>
+        <div class="timer-estrelas">★<br>✦<br>★</div>
+        <div class="timer-bandeiras">
+          <span style="background:#C0392B"></span>
+          <span style="background:#F39C12"></span>
+          <span style="background:#27AE60"></span>
+          <span style="background:#2980B9"></span>
+          <span style="background:#8E44AD"></span>
+          <span style="background:#F39C12"></span>
+          <span style="background:#C0392B"></span>
+          <span style="background:#27AE60"></span>
+          <span style="background:#2980B9"></span>
+          <span style="background:#8E44AD"></span>
+          <span style="background:#F39C12"></span>
+          <span style="background:#C0392B"></span>
         </div>
-        <div class="timer-num-wrap">
-          <div class="timer-num">${dias}</div>
-        </div>
-        <div class="timer-txt">dias para o nosso Arraiá!</div>
-        <div class="timer-dt">04 de julho de 2026 · a partir das 15h</div>
-        <div style="margin-top:10px;position:relative;z-index:1">
-          <div class="timer-pessoas">
-            <i class="ti ti-users"></i>
-            <span>${s.tot} pessoas confirmadas</span>
+        <div class="timer-titulo">Contagem regressiva</div>
+        <div class="timer-flip-wrap">
+          <div class="timer-flip-box"><div class="timer-flip"><div class="timer-flip-num">${String(diasRestantes()).padStart(2,'0')}</div></div><div class="timer-flip-label">dias</div></div>
+          <div class="timer-flip-sep">:</div>
+          <div class="timer-flip-box">
+            <div class="timer-flip" id="timer-hh"><div class="timer-flip-num" id="thh">00</div></div>
+            <div class="timer-flip-label">horas</div>
+          </div>
+          <div class="timer-flip-sep">:</div>
+          <div class="timer-flip-box">
+            <div class="timer-flip" id="timer-mm"><div class="timer-flip-num" id="tmm">00</div></div>
+            <div class="timer-flip-label">min</div>
+          </div>
+          <div class="timer-flip-sep">:</div>
+          <div class="timer-flip-box">
+            <div class="timer-flip" id="timer-ss"><div class="timer-flip-num" id="tss">00</div></div>
+            <div class="timer-flip-label">seg</div>
           </div>
         </div>
-        <div class="timer-flag" style="margin-top:10px;margin-bottom:0">
-          <span style="background:#C0392B"></span><span style="background:#F39C12"></span>
-          <span style="background:#27AE60"></span><span style="background:#2980B9"></span>
-          <span style="background:#8E44AD"></span><span style="background:#C0392B"></span>
-          <span style="background:#F39C12"></span><span style="background:#27AE60"></span>
+        <div class="timer-data-pill">
+          <i class="ti ti-calendar-event"></i>
+          <span>04 de julho de 2026 · a partir das 15h</span>
+        </div>
+        <div class="timer-bandeiras" style="margin-top:14px;margin-bottom:0">
+          <span style="background:#8E44AD"></span>
+          <span style="background:#2980B9"></span>
+          <span style="background:#27AE60"></span>
+          <span style="background:#F39C12"></span>
+          <span style="background:#C0392B"></span>
+          <span style="background:#8E44AD"></span>
+          <span style="background:#2980B9"></span>
+          <span style="background:#27AE60"></span>
+          <span style="background:#F39C12"></span>
+          <span style="background:#C0392B"></span>
+          <span style="background:#8E44AD"></span>
+          <span style="background:#2980B9"></span>
         </div>
       </div>
+
       <div class="grid2" style="margin-bottom:10px">
         <div class="kpi verm"><div class="kl">Pessoas confirmadas</div><div class="kv">${s.tot}</div></div>
         <div class="kpi azul"><div class="kl">No rateio do chopp</div><div class="kv">${s.totalChopp}</div></div>
@@ -732,6 +767,20 @@ function capturarImg2(){
   }).catch(()=>toast('Erro ao gerar imagem'));
 }
 
+function tickTimer(){
+  function pad(n){return String(n).padStart(2,'0')}
+  const ev=new Date('2026-07-04T15:00:00');
+  const diff=ev-new Date();
+  const eh=document.getElementById('thh');
+  const em=document.getElementById('tmm');
+  const es=document.getElementById('tss');
+  if(!eh||!em||!es) return;
+  if(diff<=0){eh.textContent='00';em.textContent='00';es.textContent='00';return;}
+  eh.textContent=pad(Math.floor(diff/3600000)%24);
+  em.textContent=pad(Math.floor(diff/60000)%60);
+  es.textContent=pad(Math.floor(diff/1000)%60);
+}
+setInterval(tickTimer,1000);
 function renderAll(){renderDash();renderPratos();renderChopp();renderPub()}
 
 function ir(pg){
@@ -745,7 +794,7 @@ function ir(pg){
   if(pg==='dash') renderDash();
   if(pg==='pratos') renderPratos();
   if(pg==='chopp') renderChopp();
-  if(pg==='pub') renderPub();
+  if(pg==='pub'){renderPub();setTimeout(tickTimer,50);}
 }
 
 renderAll();renderCad();renderLista();
