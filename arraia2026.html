@@ -561,7 +561,7 @@ function renderCad(v){
       <label>Contribuição (R$)</label>
       <input type="number" id="f-contrib" min="0" value="${v.contrib||0}" placeholder="0">
       <label>Celular do convidado (DDD + número) <span class="lock-icon"><i class="ti ti-lock"></i></span></label>
-      <input type="tel" id="f-cel" placeholder="Ex: 11999998888 ou 11999998888, 11988887777" value="${(v.cel||'').replace(/"/g,'&quot;')}">
+      <input type="text" id="f-cel" placeholder="Ex: 11999998888 ou 11999998888, 11988887777" style="letter-spacing:0.5px" value="${(v.cel||'').replace(/"/g,'&quot;')}">
       <label>Pessoas no rateio do chopp</label>
       <input type="number" id="f-chopp" min="0" value="${v.chopp||0}" placeholder="0">
       <label>Pagou o chopp?</label>
@@ -606,7 +606,7 @@ function salvarConv(){
     tipo:document.getElementById('f-tipo').value,
     contrib:parseInt(document.getElementById('f-contrib').value)||0,
     pg:document.getElementById('f-pg').checked,
-    cel:document.getElementById('f-cel').value.replace(/\D/g,''),
+    cel:document.getElementById('f-cel').value.split(/[,;\s]+/).map(c=>c.replace(/\D/g,'')).filter(c=>c.length>=10).join(','),
     chopp:parseInt(document.getElementById('f-chopp').value)||0,
     choppPago:document.getElementById('f-chopp-pago').value==='1'
   };
@@ -721,7 +721,7 @@ function renderPub(){
       <div class="guest-inline-titulo"><i class="ti ti-user-check" style="font-size:18px;color:#F39C12"></i>Área do convidado</div>
       <div class="guest-inline-sub">Digite seu celular (DDD + número) para ver e editar sua confirmação</div>
       <div class="guest-tel-wrap">
-        <input class="guest-tel-input" type="tel" id="pub-guest-cel" placeholder="Ex: 11999998888" maxlength="11" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')loginGuestInline()">
+        <input class="guest-tel-input" type="tel" id="pub-guest-cel" placeholder="Ex: 11999998888" maxlength="11" inputmode="numeric" pattern="[0-9]*" autocomplete="tel" onkeydown="if(event.key==='Enter')loginGuestInline()">
         <button class="guest-tel-btn" onclick="loginGuestInline()"><i class="ti ti-arrow-right" style="font-size:14px;vertical-align:-2px"></i> Entrar</button>
       </div>
       <div class="guest-tel-erro" id="pub-guest-erro">Número não encontrado. Verifique o DDD + número.</div>
@@ -1098,7 +1098,7 @@ function loginGuest(){
   const cel=document.getElementById('guest-cel').value.replace(/\D/g,'');
   const found=lista.find(d=>{
     if(!d.cel) return false;
-    return d.cel.split(',').map(c=>c.replace(/\D/g,'')).some(c=>c===cel);
+    return d.cel.split(/[,;\s]+/).map(c=>c.replace(/\D/g,'')).filter(c=>c).some(c=>c===cel);
   });
   if(!found){document.getElementById('guest-erro').style.display='block';return;}
   guestId=found.id;
@@ -1113,7 +1113,7 @@ function loginGuestInline(){
   const cel=el.value.replace(/\D/g,'');
   const found=lista.find(d=>{
     if(!d.cel) return false;
-    return d.cel.split(',').map(c=>c.replace(/\D/g,'')).some(c=>c===cel);
+    return d.cel.split(/[,;\s]+/).map(c=>c.replace(/\D/g,'')).filter(c=>c).some(c=>c===cel);
   });
   if(!found){
     if(erEl){erEl.style.display='block';}
