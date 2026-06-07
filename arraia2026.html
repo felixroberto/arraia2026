@@ -386,7 +386,9 @@ function calc(){
   const pgQtd=lista.filter(d=>d.pg).length;
   const totalChopp=lista.reduce((a,c)=>a+(c.chopp||0),0);
   const gruposChopp=lista.filter(d=>d.chopp>0).length;
-  return{tot,cri,adultos:tot-cri,contrib,comPrato,semPrato:lista.length-comPrato,sal,doc,mis,pgQtd,grupos:lista.length,totalChopp,gruposChopp};
+  const totalDorme=lista.reduce((a,c)=>a+(c.dormeQtd||0),0);
+  const gruposDorme=lista.filter(d=>d.dorme).length;
+  return{tot,cri,adultos:tot-cri,contrib,comPrato,semPrato:lista.length-comPrato,sal,doc,mis,pgQtd,grupos:lista.length,totalChopp,gruposChopp,totalDorme,gruposDorme};
 }
 
 function badgeTipo(tipo){
@@ -459,6 +461,26 @@ function renderDash(){
       <div class="kpi azul"><div class="kl">Pessoas no rateio do chopp</div><div class="kv">${s.totalChopp}</div><div class="ks">${s.gruposChopp} grupos</div></div>
       <div class="kpi larj"><div class="kl">Fora do chopp</div><div class="kv">${s.adultos-s.totalChopp}</div><div class="ks">adultos</div></div>
     </div>
+    <div class="sec">Chácara · Pernoite</div>
+    <div class="grid2">
+      <div class="kpi verd"><div class="kl">Vão dormir</div><div class="kv">${s.totalDorme}</div><div class="ks">${s.gruposDorme} grupo${s.gruposDorme!==1?'s':''}</div></div>
+      <div class="kpi roxo"><div class="kl">Só de dia</div><div class="kv">${s.tot-s.totalDorme}</div><div class="ks">pessoas</div></div>
+    </div>
+    ${s.totalDorme>0?`
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:#6B4226;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <i class="ti ti-home" style="font-size:15px;color:#534AB7"></i> Quem vai dormir na chácara
+      </div>
+      ${lista.filter(d=>d.dorme).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).map(d=>{
+        const cor=CORES[lista.indexOf(d)%CORES.length];
+        return '<div class="row-item" style="margin-bottom:5px">'
+          +'<div class="av" style="background:'+cor+'22;color:'+cor+'">'+ini(d.nome)+'</div>'
+          +'<div class="ri-info"><div class="ri-nome">'+d.nome+'</div>'
+          +'<div class="ri-det">'+(d.dormeQtd||1)+' pessoa'+(d.dormeQtd!==1?'s':'')+' dormindo</div></div>'
+          +'<span class="badge bm">'+( d.dormeQtd||1)+' 🌙</span>'
+          +'</div>';
+      }).join('')}
+    </div>`:''}
     <div class="sec">Convidados &amp; Pratos</div>
     <div class="pizza-wrap">
       <div class="pizza-card">
@@ -525,7 +547,7 @@ function renderLista(){
           :modoAtual==='guest'&&guestId===d.id
           ?'<button class="btn-ic" style="background:#F39C1222;border-color:#F39C12;color:#7A5C10" onclick="editarComoConvidado()" title="Editar minha presença"><i class="ti ti-pencil"></i></button>'
           :'';
-        return '<div class="row-item" style="'+rowStyle+'"><div class="av" style="background:'+cor+'22;color:'+cor+'">'+ini(d.nome)+'</div><div class="ri-info"><div class="ri-nome">'+d.nome+'</div><div class="ri-det">'+d.pessoas+' pessoa'+(d.pessoas>1?'s':'')+(d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):'')+(d.prato?' · '+d.prato:'')+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">'+pgB+(d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>')+chB+'</div><div class="ri-acoes">'+rowAcoes+'</div></div>';
+        return '<div class="row-item" style="'+rowStyle+'"><div class="av" style="background:'+cor+'22;color:'+cor+'">'+ini(d.nome)+'</div><div class="ri-info"><div class="ri-nome">'+d.nome+'</div><div class="ri-det">'+d.pessoas+' pessoa'+(d.pessoas>1?'s':'')+(d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):'')+(d.prato?' · '+d.prato:'')+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">'+pgB+(d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>')+chB+dbB+'</div><div class="ri-acoes">'+rowAcoes+'</div></div>';
             }).join('')}`;
 }
 
@@ -569,6 +591,16 @@ function renderCad(v){
         <option value="0" ${!(v.choppPago)?'selected':''}>Não pagou / não confirmado</option>
         <option value="1" ${v.choppPago?'selected':''}>Pagou</option>
       </select>
+      <label>Vai dormir na chácara?</label>
+      <select id="f-dorme" onchange="document.getElementById('f-dorme-qtd-wrap').style.display=this.value==='1'?'block':'none'">
+        <option value="0" ${!(v.dorme)?'selected':''}>Não vai dormir</option>
+        <option value="1" ${v.dorme?'selected':''}>Sim, vai dormir</option>
+      </select>
+      <div id="f-dorme-qtd-wrap" style="display:${v.dorme?'block':'none'}">
+        <label>Quantas pessoas vão dormir?</label>
+        <input type="number" id="f-dorme-qtd" min="1" value="${v.dormeQtd||1}" placeholder="1">
+      </div>
+
       <label class="form-check">
         <input type="checkbox" id="f-pg" ${v.pg?'checked':''}>
         <span>Confirmou pagamento</span>
@@ -608,7 +640,9 @@ function salvarConv(){
     pg:document.getElementById('f-pg').checked,
     cel:document.getElementById('f-cel').value.split(/[,;\s]+/).map(c=>c.replace(/\D/g,'')).filter(c=>c.length>=10).join(','),
     chopp:parseInt(document.getElementById('f-chopp').value)||0,
-    choppPago:document.getElementById('f-chopp-pago').value==='1'
+    choppPago:document.getElementById('f-chopp-pago').value==='1',
+    dorme:document.getElementById('f-dorme').value==='1',
+    dormeQtd:document.getElementById('f-dorme').value==='1'?(parseInt(document.getElementById('f-dorme-qtd').value)||1):0
   };
   if(editId){
     const idx=lista.findIndex(d=>d.id===editId);
