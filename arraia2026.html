@@ -178,6 +178,16 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .nav-guest-bar button{padding:5px 12px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
 .nav-guest-bar button:hover{background:rgba(255,255,255,.25)}
 .lock-icon{font-size:11px;color:#999;margin-left:4px}
+
+.guest-inline-box{background:#fff;border:2px solid #F39C12;border-radius:14px;padding:16px;margin-bottom:12px}
+.guest-inline-titulo{font-family:'Lora',serif;font-size:15px;font-weight:600;color:#7A5C10;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.guest-inline-sub{font-size:11px;color:#6B4226;margin-bottom:14px}
+.guest-tel-wrap{display:flex;gap:8px;align-items:flex-start;margin-bottom:0}
+.guest-tel-input{flex:1;padding:11px 14px;border:1.5px solid #D5B89A;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:#2C1A0E;-webkit-appearance:none}
+.guest-tel-input:focus{outline:none;border-color:#F39C12;box-shadow:0 0 0 2px rgba(243,156,18,0.2)}
+.guest-tel-btn{padding:11px 16px;background:#7A5C10;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
+.guest-tel-btn:hover{background:#9A7612}
+.guest-tel-erro{color:#A32D2D;font-size:11px;margin-top:6px;display:none}
 @media(max-width:480px){.form-row{grid-template-columns:1fr}.topo h1{font-size:14px}.grid2{grid-template-columns:1fr 1fr}}
 .guest-edit-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:#7A5C10;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:10px;width:100%;justify-content:center}
 .guest-edit-btn:hover{background:#9A7612}
@@ -207,7 +217,6 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
     </div>
   </div>
   <span class="edicao">5ª edição</span>
-  <button id="btn-guest-acesso" onclick="abrirScreenGuest()" style="background:rgba(243,156,18,0.2);border:1px solid rgba(243,156,18,0.5);border-radius:8px;cursor:pointer;padding:5px 10px;color:#F39C12;font-size:11px;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:5px;transition:all .2s" title="Área do convidado" onmouseover="this.style.background='rgba(243,156,18,0.35)'" onmouseout="this.style.background='rgba(243,156,18,0.2)'"><i class="ti ti-user-check" style="font-size:14px"></i><span>Sou convidado</span></button>
   <button id="btn-org-acesso" onclick="abrirScreenOrg()" style="background:transparent;border:none;cursor:pointer;padding:4px 6px;opacity:.35;transition:opacity .2s" title="Organizador" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='.35'"><i class="ti ti-lock" style="font-size:16px;color:#fff"></i></button>
 </div>
 <div id="nav-guest-bar" class="nav-guest-bar" style="display:none">
@@ -324,18 +333,13 @@ const SEED=[
 ];
 
 const KEY='arraia2026v3';
-const KEY_VER='arraia2026v3_ver';
-const DATA_VER='1';
-// Limpa cache se versão mudou ou se localStorage está corrompido
+// Limpa cache de dados SEMPRE — garante que o SEED atualizado seja carregado
+// Pendências são preservadas pois estão em chave separada
 (function(){
   try{
-    const v=localStorage.getItem(KEY_VER);
-    if(v!==DATA_VER){
-      localStorage.removeItem(KEY);
-      localStorage.removeItem('arraia2026v2');
-      localStorage.removeItem('arraia2026_pendencias');
-      localStorage.setItem(KEY_VER,DATA_VER);
-    }
+    localStorage.removeItem(KEY);
+    localStorage.removeItem('arraia2026v2');
+    localStorage.removeItem('arraia2026_pendencias_old');
   }catch(e){}
 })();
 function carregar(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):SEED.map(d=>({...d,chopp:d.chopp||0}))}catch(e){return SEED.map(d=>({...d,chopp:0,choppPago:false,cel:""}))}}
@@ -688,6 +692,23 @@ function renderPub(){
   const pratosPub=[...lista.filter(d=>d.prato)].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   const listaConf=[...lista].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   document.getElementById('pg-pub').innerHTML=`
+    ${modoAtual==='pub'?`
+    <div class="guest-inline-box" id="guest-inline-box">
+      <div class="guest-inline-titulo"><i class="ti ti-user-check" style="font-size:18px;color:#F39C12"></i>Área do convidado</div>
+      <div class="guest-inline-sub">Digite seu celular (DDD + número) para ver e editar sua confirmação</div>
+      <div class="guest-tel-wrap">
+        <input class="guest-tel-input" type="tel" id="pub-guest-cel" placeholder="Ex: 11999998888" maxlength="11" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')loginGuestInline()">
+        <button class="guest-tel-btn" onclick="loginGuestInline()"><i class="ti ti-arrow-right" style="font-size:14px;vertical-align:-2px"></i> Entrar</button>
+      </div>
+      <div class="guest-tel-erro" id="pub-guest-erro">Número não encontrado. Verifique o DDD + número.</div>
+    </div>`:''}
+    ${modoAtual==='guest'?`
+    <div class="guest-inline-box" style="border-color:#27AE60">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="guest-inline-titulo" style="margin-bottom:0"><i class="ti ti-user-check" style="font-size:16px;color:#27AE60"></i>Olá, ${lista.find(x=>x.id===guestId)?lista.find(x=>x.id===guestId).nome.split('+')[0].trim():''}!</div>
+        <button onclick="sairModoConvidado()" style="padding:5px 12px;background:transparent;border:1px solid #D5B89A;border-radius:6px;font-size:11px;color:#6B4226;cursor:pointer;font-family:inherit"><i class="ti ti-logout" style="font-size:12px;vertical-align:-1px"></i> Sair</button>
+      </div>
+    </div>`:''}
     <div id="pub-captura">
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;padding:10px;background:#fff;border-radius:12px;border:1px solid #F0E0C8">
         <svg width="40" height="40" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1026,6 +1047,31 @@ function loginGuest(){
   ativarModoConvidado(found, window._guestRedirectEdit);
   window._guestRedirectEdit=false;
 }
+function loginGuestInline(){
+  const el=document.getElementById('pub-guest-cel');
+  const erEl=document.getElementById('pub-guest-erro');
+  if(!el) return;
+  const cel=el.value.replace(/\D/g,'');
+  const found=lista.find(d=>{
+    if(!d.cel) return false;
+    return d.cel.split(',').map(c=>c.replace(/\D/g,'')).some(c=>c===cel);
+  });
+  if(!found){
+    if(erEl){erEl.style.display='block';}
+    el.style.borderColor='#A32D2D';
+    setTimeout(()=>{el.style.borderColor='';},1500);
+    return;
+  }
+  if(erEl) erEl.style.display='none';
+  guestId=found.id;
+  ativarModoConvidado(found, false);
+  // Re-renderizar pub para mostrar saudação e esconder formulário de celular
+  renderPub();
+  setTimeout(()=>{
+    const box=document.getElementById('guest-inline-box');
+    if(box) box.scrollIntoView({behavior:'smooth',block:'start'});
+  },100);
+}
 function ativarModoConvidado(convidado, abrirForm){
   modoAtual='guest';
   document.querySelectorAll('.nav-btn').forEach(b=>{
@@ -1053,6 +1099,7 @@ function sairModoConvidado(){
   document.getElementById('nav-guest-bar').style.display='none';
   document.querySelectorAll('.nav-btn[data-pub]').forEach(b=>b.style.display='');
   const bga=document.getElementById('btn-guest-acesso');if(bga)bga.style.display='';
+  renderPub();
   ir('pub');
 }
 
