@@ -542,6 +542,7 @@ function renderLista(){
         const chB=d.chopp>0?`<span class="badge bchopp">${d.chopp} no chopp</span>${d.choppPago?'<span class="badge bp" style="margin-left:2px">Pago</span>':''}`:'';
         const isMyRow=modoAtual==='guest'&&guestId===d.id;
         const rowStyle=isMyRow?'border:1.5px solid #F39C12;background:#FFFBF0;':'';
+        const dbB=d.dorme?'<span class="badge bm" style="margin-left:2px">🌙 dorme</span>':'';
         const rowAcoes=modoAtual==='org'
           ?('<button class="btn-ic" onclick="abrirEdit('+d.id+')" title="Editar"><i class="ti ti-edit"></i></button>'+'<button class="btn-ic del" onclick="excluir('+d.id+')" title="Excluir"><i class="ti ti-trash"></i></button>')
           :modoAtual==='guest'&&guestId===d.id
