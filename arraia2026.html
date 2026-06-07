@@ -188,6 +188,13 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .guest-tel-btn{padding:11px 16px;background:#7A5C10;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
 .guest-tel-btn:hover{background:#9A7612}
 .guest-tel-erro{color:#A32D2D;font-size:11px;margin-top:6px;display:none}
+.nav-badge{position:absolute;top:4px;right:6px;background:#E74C3C;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center;line-height:16px}
+.nav-btn{position:relative}
+.alerta-pend{display:none;background:#FEF3C7;border-left:4px solid #F39C12;padding:10px 14px;font-size:12px;color:#92400E;align-items:center;gap:10px;cursor:pointer}
+.alerta-pend.visivel{display:flex}
+.alerta-pend i{font-size:18px;flex-shrink:0}
+.alerta-pend-txt{flex:1}
+.alerta-pend-btn{padding:5px 12px;background:#7A5C10;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 @media(max-width:480px){.form-row{grid-template-columns:1fr}.topo h1{font-size:14px}.grid2{grid-template-columns:1fr 1fr}}
 .guest-edit-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:#7A5C10;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:10px;width:100%;justify-content:center}
 .guest-edit-btn:hover{background:#9A7612}
@@ -232,6 +239,11 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
   <button class="nav-btn" onclick="ir('pub')" data-pub="1"><i class="ti ti-speakerphone"></i>Para todos</button>
   <button class="nav-btn" id="nav-guest-btn" onclick="abrirScreenGuest()" data-guest="1" style="display:none"><i class="ti ti-user-check"></i>Minha presença</button>
   <button class="nav-btn" id="nav-sug-btn" data-guest="1" style="display:none" onclick="ir('sugestoes')"><i class="ti ti-salad"></i>Sugestões</button>
+</div>
+<div id="alerta-pend-bar" class="alerta-pend" onclick="irParaPendencias()">
+  <i class="ti ti-bell-ringing"></i>
+  <div class="alerta-pend-txt"><strong id="alerta-pend-count">0</strong> solicitação(ões) de convidados aguardando sua aprovação</div>
+  <button class="alerta-pend-btn">Ver agora</button>
 </div>
 <div id="pg-dash" class="pg on"></div>
 <div id="pg-lista" class="pg"></div>
@@ -333,13 +345,25 @@ const SEED=[
 ];
 
 const KEY='arraia2026v3';
-// Limpa cache de dados SEMPRE — garante que o SEED atualizado seja carregado
-// Pendências são preservadas pois estão em chave separada
+const KEY_SEED_HASH='arraia2026v3_hash';
+// Calcula hash simples do SEED para detectar mudanças no arquivo
+function seedHash(){
+  const s=JSON.stringify(SEED);
+  let h=0;
+  for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}
+  return String(h);
+}
+// Só limpa o cache de dados se o SEED do arquivo mudou
+// Isso preserva cadastros e edições feitas pelo organizador
 (function(){
   try{
-    localStorage.removeItem(KEY);
-    localStorage.removeItem('arraia2026v2');
-    localStorage.removeItem('arraia2026_pendencias_old');
+    const h=seedHash();
+    const prev=localStorage.getItem(KEY_SEED_HASH);
+    if(prev!==h){
+      localStorage.removeItem(KEY);
+      localStorage.removeItem('arraia2026v2');
+      localStorage.setItem(KEY_SEED_HASH,h);
+    }
   }catch(e){}
 })();
 function carregar(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):SEED.map(d=>({...d,chopp:d.chopp||0}))}catch(e){return SEED.map(d=>({...d,chopp:0,choppPago:false,cel:""}))}}
@@ -981,6 +1005,40 @@ function hexToRgb(hex){
   return [r,g,b];
 }
 
+function atualizarAlertaPendencias(){
+  try{
+    const bar=document.getElementById('alerta-pend-bar');
+    const cnt=document.getElementById('alerta-pend-count');
+    const navPainel=document.querySelector('.nav-btn');
+    if(!bar) return;
+    const pends=carregarPendencias().filter(p=>p.status==='pendente');
+    const n=pends.length;
+    if(modoAtual==='org'&&n>0){
+      bar.classList.add('visivel');
+      if(cnt) cnt.textContent=n;
+      // badge vermelho no botão Painel
+      let badge=document.getElementById('nav-badge-dash');
+      if(!badge&&navPainel){
+        badge=document.createElement('span');
+        badge.id='nav-badge-dash';
+        badge.className='nav-badge';
+        navPainel.appendChild(badge);
+      }
+      if(badge) badge.textContent=n;
+    } else {
+      bar.classList.remove('visivel');
+      const badge=document.getElementById('nav-badge-dash');
+      if(badge) badge.remove();
+    }
+  }catch(e){}
+}
+function irParaPendencias(){
+  ir('dash');
+  setTimeout(()=>{
+    const el=document.querySelector('.pendencias-bar');
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  },200);
+}
 function tickTimer(){
   function pad(n){return String(n).padStart(2,'0')}
   const ev=new Date('2026-07-04T15:00:00');
@@ -1029,6 +1087,7 @@ function ativarModoOrg(){
   document.getElementById('btn-org-acesso').style.display='none';
   const bg=document.getElementById('btn-guest-acesso');if(bg)bg.style.display='none';
   toast('Bem-vindo, organizador!');
+  atualizarAlertaPendencias();
   ir('dash');
 }
 
@@ -1201,6 +1260,7 @@ function enviarSolicitacao(){
   pendencias.push({id:guestId,nome:d.nome,prato,tipo,chopp,status:'pendente',ts:new Date().toISOString()});
   salvarPendencias(pendencias);
   toast('Solicitação enviada! Aguardando aprovação do organizador.');
+  atualizarAlertaPendencias();
   renderGuest(false);
 }
 
@@ -1239,6 +1299,7 @@ function aprovarPend(id){
   salvarLS();
   renderAll();
   renderDash();
+  atualizarAlertaPendencias();
   toast('Aprovado e atualizado!');
 }
 function rejeitarPend(id){
@@ -1248,6 +1309,7 @@ function rejeitarPend(id){
   p.status='rejeitado';
   salvarPendencias(pendencias);
   renderDash();
+  atualizarAlertaPendencias();
   toast('Solicitação rejeitada');
 }
 
