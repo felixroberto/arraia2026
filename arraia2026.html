@@ -287,6 +287,8 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 const CORES=['#C0392B','#E67E22','#F39C12','#27AE60','#16A085','#2980B9','#8E44AD','#D35400','#0F6E56'];
 function corAv(i){return CORES[i%CORES.length]}
 function ini(n){const p=n.trim().split(/\s+/);return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase()}
+const JUNINO_ICONS=['🌽','🎪','🎵','🌟','🎊','🎆','⭐','🎈','🪗','🌾'];
+function juninoIcon(idx){return JUNINO_ICONS[idx%JUNINO_ICONS.length];}
 function fmt(n){return'R$ '+Number(n).toLocaleString('pt-BR')}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
@@ -474,7 +476,7 @@ function renderDash(){
       ${lista.filter(d=>d.dorme).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).map(d=>{
         const cor=CORES[lista.indexOf(d)%CORES.length];
         return '<div class="row-item" style="margin-bottom:5px">'
-          +'<div class="av" style="background:'+cor+'22;color:'+cor+'">'+ini(d.nome)+'</div>'
+          +'<div class="av" style="background:'+cor+'22;font-size:18px">'+juninoIcon(lista.indexOf(d))+'</div>'
           +'<div class="ri-info"><div class="ri-nome">'+d.nome+'</div>'
           +'<div class="ri-det">'+(d.dormeQtd||1)+' pessoa'+(d.dormeQtd!==1?'s':'')+' dormindo</div></div>'
           +'<span class="badge bm">'+( d.dormeQtd||1)+' 🌙</span>'
@@ -1214,11 +1216,19 @@ function renderGuest(abrirForm){
   document.getElementById('pg-guest').innerHTML=`
     <div class="guest-card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div class="av" style="width:44px;height:44px;background:${cor}22;color:${cor};font-size:14px">${ini(d.nome)}</div>
+        <div class="av" style="width:44px;height:44px;background:${cor}22;font-size:24px">${juninoIcon(lista.indexOf(d))}</div>
         <div style="flex:1;min-width:0">
           <div class="guest-card-nome">${d.nome}</div>
           <div class="guest-card-det">${d.pessoas} pessoa${d.pessoas>1?'s':''} · ${d.criancas?d.criancas+' criança'+(d.criancas>1?'s':'')+' · ':''}confirmado</div>
         </div>
+      </div>
+      <div class="guest-info-row">
+        <span class="guest-info-label"><i class="ti ti-users" style="font-size:12px;vertical-align:-1px"></i> Nome / grupo</span>
+        <span class="guest-info-val" style="max-width:180px;white-space:normal;text-align:right;font-size:11px">${d.nome}</span>
+      </div>
+      <div class="guest-info-row">
+        <span class="guest-info-label"><i class="ti ti-user" style="font-size:12px;vertical-align:-1px"></i> Número de pessoas</span>
+        <span class="guest-info-val">${d.pessoas} pessoa${d.pessoas>1?'s':''}${d.criancas?' ('+d.criancas+' criança'+(d.criancas>1?'s':'')+')':''}</span>
       </div>
       <div class="guest-info-row">
         <span class="guest-info-label"><i class="ti ti-tools-kitchen-2" style="font-size:12px;vertical-align:-1px"></i> Prato</span>
@@ -1229,9 +1239,17 @@ function renderGuest(abrirForm){
         <span class="guest-info-val">${d.chopp||0} pessoa${(d.chopp||0)!==1?'s':''}</span>
       </div>
       <div class="guest-info-row">
+        <span class="guest-info-label"><i class="ti ti-beer" style="font-size:12px;vertical-align:-1px"></i> Pagou o chopp?</span>
+        <span class="${d.choppPago?'badge-pg-ok':'badge-chopp-no'}">${d.choppPago?'Chopp - OK':'Pendente'}</span>
+      </div>
+      <div class="guest-info-row">
         <span class="guest-info-label"><i class="ti ti-cash" style="font-size:12px;vertical-align:-1px"></i> Pagamento</span>
         <span class="${d.pg?'badge-pg-ok':'badge-pg-no'}">${d.pg?'Pagamento - OK':'Pagamento Pendente'}</span>
       </div>
+      ${d.dorme?`<div class="guest-info-row">
+        <span class="guest-info-label">🌙 Vai dormir na chácara</span>
+        <span class="guest-info-val" style="color:#534AB7;font-weight:600">Sim · ${d.dormeQtd||1} pessoa${(d.dormeQtd||1)!==1?'s':''}</span>
+      </div>`:''}
       ${minhaPend?`<div style="margin-top:10px;background:#FEF3C7;border-radius:8px;padding:8px 10px;font-size:11px;color:#92400E;display:flex;align-items:center;gap:7px"><i class="ti ti-clock" style="font-size:14px;flex-shrink:0"></i><span>Alteração aguardando aprovação do organizador</span><span class="pendente-badge" style="margin-left:auto">Pendente</span></div>`:''}
       <button class="guest-edit-btn" onclick="toggleGuestForm()">
         <i class="ti ti-pencil" style="font-size:15px"></i> Editar minha participação
