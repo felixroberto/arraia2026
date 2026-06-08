@@ -465,8 +465,8 @@ const SEED=[
   {id:41,nome:"Yasmin e Kevin (Postall)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Bolo de Paçoca Recheado",tipo:"DOCE",chopp:0,choppPago:false,cel:""}
 ];
 
-const KEY='arraia2026v3';
-const KEY_SEED_HASH='arraia2026v3_hash';
+const KEY='arraia2026v4';
+const KEY_SEED_HASH='arraia2026v4_hash';
 // Calcula hash simples do SEED para detectar mudanças no arquivo
 function seedHash(){
   const s=JSON.stringify(SEED);
@@ -478,11 +478,16 @@ function seedHash(){
 // Isso preserva cadastros e edições feitas pelo organizador
 (function(){
   try{
-    const h=seedHash();
-    const prev=localStorage.getItem(KEY_SEED_HASH);
+    // Limpar TODAS as versões antigas de uma vez
+    var oldKeys=['arraia2026','arraia2026v2','arraia2026v3','arraia2026v3_hash',
+                 'arraia2026_pendencias','arraia2026v3_pendencias',
+                 'arraia2026_etag','arraia2026v3_ver'];
+    oldKeys.forEach(function(k){localStorage.removeItem(k);});
+    // Só limpa v4 se o SEED mudou (protege cadastros novos)
+    var h=seedHash();
+    var prev=localStorage.getItem(KEY_SEED_HASH);
     if(prev!==h){
       localStorage.removeItem(KEY);
-      localStorage.removeItem('arraia2026v2');
       localStorage.setItem(KEY_SEED_HASH,h);
     }
   }catch(e){}
@@ -1270,7 +1275,7 @@ setInterval(tickTimer,1000);
 
 // ══════ FASE 2 ══════
 const ORG_SENHA = 'Fe@2026';
-const KEY_PEND = 'arraia2026v3_pendencias';
+const KEY_PEND = 'arraia2026v4_pendencias';
 const KEY_MODE = 'arraia2026_mode';
 let modoAtual = 'pub'; // 'org' | 'guest'
 let guestId = null;
