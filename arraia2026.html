@@ -209,6 +209,12 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .guest-info-label{font-size:11px;color:#6B4226}
 .guest-info-val{font-size:12px;font-weight:600;color:#2C1A0E;text-align:right}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  (function(){
+    emailjs.init({publicKey:'cRO95X8hap06Y4upP'});
+  })();
+</script>
 </head>
 <body>
 <div class="bandeira"></div>
@@ -554,7 +560,7 @@ function renderLista(){
           :modoAtual==='guest'&&guestId===d.id
           ?'<button class="btn-ic" style="background:#F39C1222;border-color:#F39C12;color:#7A5C10" onclick="editarComoConvidado()" title="Editar minha presença"><i class="ti ti-pencil"></i></button>'
           :'';
-        return '<div class="row-item" style="'+rowStyle+'"><div class="av" style="background:'+cor+'22;font-size:18px">'+juninoIcon(idx)+'</div><div class="ri-info"><div class="ri-nome">'+d.nome+'</div><div class="ri-det">'+d.pessoas+' pessoa'+(d.pessoas>1?'s':'')+(d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):'')+(d.prato?' · '+d.prato:'')+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">'+pgB+(d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>')+chB+dbB+'</div><div class="ri-acoes">'+rowAcoes+'</div></div>';
+        return '<div class="row-item" style="'+rowStyle+'"><div class="av" style="background:'+cor+'22;font-size:18px">'+juninoIcon(idx)+'</div><div class="ri-info"><div class="ri-nome">'+d.nome+'</div><div class="ri-det">'+d.pessoas+' pessoa'+(d.pessoas>1?'s':'')+(d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):'')+(d.prato?' · '+d.prato:'')+'</div>'+(d.chopp>0?'<div class="ri-det" style="color:#185FA5;margin-top:2px">🍺 '+d.chopp+' pessoa'+(d.chopp>1?'s':'')+' no rateio do chopp</div>':'')+'</div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">'+pgB+(d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>')+chB+dbB+'</div><div class="ri-acoes">'+rowAcoes+'</div></div>';
             }).join('')}`;
 }
 
@@ -1354,6 +1360,23 @@ function enviarSolicitacao(){
   toast('Solicitação enviada! Aguardando aprovação do organizador.');
   atualizarAlertaPendencias();
   renderGuest(false);
+  // Disparar e-mail via EmailJS
+  try{
+    const tipoLabel={'SALGADO':'Salgado','DOCE':'Doce','MISTO':'Misto (salgado + doce)','':'Não informado'};
+    emailjs.send('service_dx88u0e','template_0meyijc',{
+      nome_convidado: d.nome,
+      prato: prato||'Não informado',
+      tipo: tipoLabel[tipo]||tipo||'Não informado',
+      chopp: chopp>0 ? chopp+' pessoa'+(chopp>1?'s':'')+' no rateio' : 'Não vai entrar no rateio',
+      link: 'https://felixroberto.github.io/arraia2026/arraia2026.html'
+    }).then(()=>{
+      console.log('E-mail enviado ao organizador');
+    }).catch(err=>{
+      console.warn('Erro ao enviar e-mail:',err);
+    });
+  }catch(e){
+    console.warn('EmailJS não disponível:',e);
+  }
 }
 
 // ── PAINEL DE PENDÊNCIAS (para o organizador) ───────────────────
