@@ -195,6 +195,10 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .alerta-pend i{font-size:18px;flex-shrink:0}
 .alerta-pend-txt{flex:1}
 .alerta-pend-btn{padding:5px 12px;background:#7A5C10;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.pub-busca-w{position:relative;margin-bottom:10px}
+.pub-busca-w i{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:#AAA}
+.pub-busca-w input{padding-left:32px;margin-bottom:0;width:100%;padding-top:9px;padding-bottom:9px;border:1px solid #D5B89A;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#2C1A0E}
+.pub-busca-w input:focus{outline:none;border-color:#8B6914}
 @media(max-width:480px){.form-row{grid-template-columns:1fr}.topo h1{font-size:14px}.grid2{grid-template-columns:1fr 1fr}}
 .guest-edit-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:#7A5C10;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:10px;width:100%;justify-content:center}
 .guest-edit-btn:hover{background:#9A7612}
@@ -292,7 +296,7 @@ function juninoIcon(idx){return JUNINO_ICONS[idx%JUNINO_ICONS.length];}
 function fmt(n){return'R$ '+Number(n).toLocaleString('pt-BR')}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
-const DATA_EVENTO=new Date('2026-07-04T15:00:00');
+const DATA_EVENTO=new Date('2026-07-04T14:30:00');
 function diasRestantes(){
   const hoje=new Date();
   hoje.setHours(0,0,0,0);
@@ -823,7 +827,7 @@ function renderPub(){
         </div>
         <div class="timer-data-pill">
           <i class="ti ti-calendar-event"></i>
-          <span>04 de julho de 2026 · a partir das 15h</span>
+          <span>04 de julho de 2026 · a partir das 14h30</span>
         </div>
         <div class="timer-bandeiras" style="margin-top:14px;margin-bottom:0">
           <span style="background:#8E44AD"></span>
@@ -867,15 +871,21 @@ function renderPub(){
         </div>
       </div>
     </div>
+    <div class="pub-busca-w" style="margin-top:4px">
+      <i class="ti ti-search"></i>
+      <input type="text" id="pub-busca-nome" placeholder="Buscar convidado pelo nome..." oninput="filtrarListaPub(this.value)">
+    </div>
     <div id="pub-captura2" style="background:#FFF9F0;padding:0 0 4px">
       <div class="card" style="margin:0 0 6px">
         <div style="font-size:12px;font-weight:600;margin-bottom:10px">Lista de Confirmação (Pratos e Pagamento)</div>
         ${(()=>{
+            const buscaPub=(document.getElementById('pub-busca-nome')||{value:''}).value.toLowerCase();
             const CORES=['#C0392B','#E67E22','#F39C12','#27AE60','#16A085','#2980B9','#8E44AD','#D35400'];
-            return listaConf.map((d,idx)=>{
+            const listaFiltrada=listaConf.filter(d=>!buscaPub||d.nome.toLowerCase().includes(buscaPub));
+            if(!listaFiltrada.length) return '<div style="text-align:center;padding:16px;color:#AAA;font-size:13px">Nenhum convidado encontrado</div>';
+            return listaFiltrada.map((d,idx)=>{
               const cor=CORES[idx%8];
               const temPrato=!!d.prato;
-              const initials=d.nome.trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
               let bprat=temPrato?'':`<span class="badge-prato-n">Prato Pendente</span>`;
               if(d.tipo==='SALGADO') bprat=`<span class="badge-prato-s">Salgado</span>`;
               else if(d.tipo==='DOCE') bprat=`<span class="badge-prato-d">Doce</span>`;
@@ -884,7 +894,9 @@ function renderPub(){
               const alertClass=!temPrato?'sem-prato-alert':'';
               const pratotxt=d.prato||'⚠ Prato não confirmado';
               const pgBadge=d.pg?`<span class="badge-pg-ok">Pagamento - OK</span>`:`<span class="badge-pg-no">Pagamento Pendente</span>`;
-              return `<div class="conf-item ${alertClass}"><div class="conf-av" style="background:${cor}22;font-size:16px">${juninoIcon(idx)}</div><div class="conf-info"><div class="conf-nome">${d.nome}</div><div class="conf-prato">${pratotxt}</div></div><div class="conf-badges">${pgBadge}${bprat}${choppBadge}</div></div>`;
+              const choppDetLine=d.chopp>0?`<div class="conf-prato" style="color:#185FA5;margin-top:1px">🍺 ${d.chopp} pessoa${d.chopp>1?'s':''} no rateio</div>`:'';
+              const idxReal=lista.indexOf(d);
+              return `<div class="conf-item ${alertClass}"><div class="conf-av" style="background:${cor}22;font-size:16px">${juninoIcon(idxReal)}</div><div class="conf-info"><div class="conf-nome">${d.nome}</div><div class="conf-prato">${pratotxt}</div>${choppDetLine}</div><div class="conf-badges">${pgBadge}${bprat}${choppBadge}</div></div>`;
             }).join('');
           })()}
       </div>
@@ -896,6 +908,33 @@ function renderPub(){
     </div>`:''}\n  `;
 }
 
+function filtrarListaPub(v){
+  // Re-renderiza apenas o bloco pub-captura2 sem recarregar tudo
+  const s=calc();
+  const listaConf=[...lista].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const busca=v.toLowerCase();
+  const CORES=['#C0392B','#E67E22','#F39C12','#27AE60','#16A085','#2980B9','#8E44AD','#D35400'];
+  const card=document.querySelector('#pub-captura2 .card');
+  if(!card) return;
+  const filtrado=listaConf.filter(d=>!busca||d.nome.toLowerCase().includes(busca));
+  card.innerHTML='<div style="font-size:12px;font-weight:600;margin-bottom:10px">Lista de Confirmação (Pratos e Pagamento)</div>'
+    +(filtrado.length===0?'<div style="text-align:center;padding:16px;color:#AAA;font-size:13px">Nenhum convidado encontrado</div>'
+    :filtrado.map((d,idx)=>{
+      const cor=CORES[idx%8];
+      const temPrato=!!d.prato;
+      let bprat=temPrato?'':`<span class="badge-prato-n">Prato Pendente</span>`;
+      if(d.tipo==='SALGADO') bprat=`<span class="badge-prato-s">Salgado</span>`;
+      else if(d.tipo==='DOCE') bprat=`<span class="badge-prato-d">Doce</span>`;
+      else if(d.tipo==='MISTO') bprat=`<span class="badge-prato-m">Misto</span>`;
+      const choppBadge=d.chopp>0?(d.choppPago?`<span class="badge-chopp-ok">Chopp - OK</span>`:`<span class="badge-chopp-no">Chopp Pendente</span>`):'';
+      const alertClass=!temPrato?'sem-prato-alert':'';
+      const pratotxt=d.prato||'⚠ Prato não confirmado';
+      const pgBadge=d.pg?`<span class="badge-pg-ok">Pagamento - OK</span>`:`<span class="badge-pg-no">Pagamento Pendente</span>`;
+      const choppDetLine=d.chopp>0?`<div class="conf-prato" style="color:#185FA5;margin-top:1px">🍺 ${d.chopp} pessoa${d.chopp>1?'s':''} no rateio</div>`:'';
+      const idxReal=lista.indexOf(d);
+      return `<div class="conf-item ${alertClass}"><div class="conf-av" style="background:${cor}22;font-size:16px">${juninoIcon(idxReal)}</div><div class="conf-info"><div class="conf-nome">${d.nome}</div><div class="conf-prato">${pratotxt}</div>${choppDetLine}</div><div class="conf-badges">${pgBadge}${bprat}${choppBadge}</div></div>`;
+    }).join(''));
+}
 function baixarLogo(){
   const svgData = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -1018,7 +1057,7 @@ function gerarPDF(){
       pdf.setFontSize(8);
       pdf.setTextColor(107,66,38);
       pdf.setFont('helvetica','normal');
-      pdf.text('Arraiá dos Amigos F&W 2026  ·  04/07/2026 a partir das 15h  ·  Gerado em '+new Date().toLocaleDateString('pt-BR'),pw/2,rodapeY,{align:'center'});
+      pdf.text('Arraiá dos Amigos F&W 2026  ·  04/07/2026 a partir das 14h30  ·  Gerado em '+new Date().toLocaleDateString('pt-BR'),pw/2,rodapeY,{align:'center'});
 
       // bandeirinha no rodapé
       banCores.forEach((c,i)=>{
@@ -1078,7 +1117,7 @@ function irParaPendencias(){
 }
 function tickTimer(){
   function pad(n){return String(n).padStart(2,'0')}
-  const ev=new Date('2026-07-04T15:00:00');
+  const ev=new Date('2026-07-04T14:30:00');
   const diff=ev-new Date();
   const eh=document.getElementById('thh');
   const em=document.getElementById('tmm');
