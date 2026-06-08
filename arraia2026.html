@@ -550,7 +550,7 @@ function renderLista(){
           :modoAtual==='guest'&&guestId===d.id
           ?'<button class="btn-ic" style="background:#F39C1222;border-color:#F39C12;color:#7A5C10" onclick="editarComoConvidado()" title="Editar minha presença"><i class="ti ti-pencil"></i></button>'
           :'';
-        return '<div class="row-item" style="'+rowStyle+'"><div class="av" style="background:'+cor+'22;color:'+cor+'">'+ini(d.nome)+'</div><div class="ri-info"><div class="ri-nome">'+d.nome+'</div><div class="ri-det">'+d.pessoas+' pessoa'+(d.pessoas>1?'s':'')+(d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):'')+(d.prato?' · '+d.prato:'')+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">'+pgB+(d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>')+chB+dbB+'</div><div class="ri-acoes">'+rowAcoes+'</div></div>';
+        return '<div class="row-item" style="'+rowStyle+'"><div class="av" style="background:'+cor+'22;font-size:18px">'+juninoIcon(idx)+'</div><div class="ri-info"><div class="ri-nome">'+d.nome+'</div><div class="ri-det">'+d.pessoas+' pessoa'+(d.pessoas>1?'s':'')+(d.criancas?' · '+d.criancas+' criança'+(d.criancas>1?'s':''):'')+(d.prato?' · '+d.prato:'')+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">'+pgB+(d.prato?badgeTipo(d.tipo):'<span class="badge bn">Sem prato</span>')+chB+dbB+'</div><div class="ri-acoes">'+rowAcoes+'</div></div>';
             }).join('')}`;
 }
 
@@ -730,14 +730,14 @@ function renderChopp(){
     <div class="sec">Confirmados no chopp (${comChopp.length} grupos · ${s.totalChopp} pessoas)</div>
     ${comChopp.length===0?'<div class="empty">Nenhum grupo confirmou chopp ainda</div>':
       comChopp.map(d=>`<div class="chopp-row">
-        <div class="chopp-av">${ini(d.nome)}</div>
+        <div class="chopp-av" style="font-size:18px;background:transparent">${juninoIcon(lista.indexOf(d))}</div>
         <div class="ri-info"><div class="ri-nome">${d.nome}</div><div class="ri-det">${d.pessoas} pessoa${d.pessoas>1?'s':''} no grupo</div></div>
         <span class="badge bchopp">${d.chopp} no chopp</span>${d.choppPago?'<span class="badge bp">Pago</span>':'<span class="badge bpend">Pendente</span>'}
         <button class="btn-ic" onclick="abrirEdit(${d.id})" title="Editar"><i class="ti ti-edit"></i></button>
       </div>`).join('')}
     <div class="sec">Sem chopp confirmado (${semChopp.length})</div>
     ${semChopp.map(d=>`<div class="chopp-row" style="opacity:.55">
-      <div class="chopp-av" style="background:#F5F5F5;color:#AAA">${ini(d.nome)}</div>
+      <div class="chopp-av" style="font-size:18px;background:#F5F5F5">${juninoIcon(lista.indexOf(d))}</div>
       <div class="ri-info"><div class="ri-nome">${d.nome}</div><div class="ri-det">${d.pessoas} pessoa${d.pessoas>1?'s':''}</div></div>
       <span class="badge bn">Não confirmado</span>
       <button class="btn-ic" onclick="abrirEdit(${d.id})" title="Editar"><i class="ti ti-edit"></i></button>
@@ -884,7 +884,7 @@ function renderPub(){
               const alertClass=!temPrato?'sem-prato-alert':'';
               const pratotxt=d.prato||'⚠ Prato não confirmado';
               const pgBadge=d.pg?`<span class="badge-pg-ok">Pagamento - OK</span>`:`<span class="badge-pg-no">Pagamento Pendente</span>`;
-              return `<div class="conf-item ${alertClass}"><div class="conf-av" style="background:${cor}22;color:${cor}">${initials}</div><div class="conf-info"><div class="conf-nome">${d.nome}</div><div class="conf-prato">${pratotxt}</div></div><div class="conf-badges">${pgBadge}${bprat}${choppBadge}</div></div>`;
+              return `<div class="conf-item ${alertClass}"><div class="conf-av" style="background:${cor}22;font-size:16px">${juninoIcon(idx)}</div><div class="conf-info"><div class="conf-nome">${d.nome}</div><div class="conf-prato">${pratotxt}</div></div><div class="conf-badges">${pgBadge}${bprat}${choppBadge}</div></div>`;
             }).join('');
           })()}
       </div>
