@@ -286,13 +286,7 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 </head>
 <body>
 <div class="bandeira"></div>
-<div id="migrar-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,249,240,0.97);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;text-align:center">
-  <div style="font-size:48px">🎪</div>
-  <div style="font-family:'Lora',serif;font-size:20px;color:#7A5C10;font-weight:600">Dados encontrados no navegador!</div>
-  <div style="font-size:14px;color:#6B4226;max-width:320px;line-height:1.6" id="migrar-info">Encontramos <strong id="migrar-count">0</strong> convidados salvos neste navegador.<br>Deseja enviar para a nuvem?</div>
-  <button onclick="confirmarMigracao()" style="padding:12px 28px;background:#27AE60;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit">✓ Sim, enviar para a nuvem</button>
-  <button onclick="recusarMigracao()" style="padding:10px 20px;background:transparent;color:#6B4226;border:1px solid #D5B89A;border-radius:10px;font-size:13px;cursor:pointer;font-family:inherit">Não, usar dados da nuvem</button>
-</div>
+
 <div id="loading-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,249,240,0.92);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px">
   <div style="font-size:48px">🎪</div>
   <div style="font-family:'Lora',serif;font-size:18px;color:#7A5C10;font-weight:600">Carregando dados...</div>
@@ -483,7 +477,7 @@ const SEED=[
 // JSONBIN — banco de dados na nuvem
 // ══════════════════════════════════════════════════════
 const JB_BIN   = '6a30b09ff5f4af5e29f8aa4f';
-const JB_KEY   = '$2a$10$ithiYVCVRXLUM6EXA9U5S.HNk.nehOQmC08F3nUY7qDRevjRbJNm6';
+const JB_KEY   = '$2a$10$AQ1CGpvvX5mL3eJIPvCeg.OozEH59rIH5Fk9RSsLJDNOmEPiRkFra';
 const JB_URL   = 'https://api.jsonbin.io/v3/b/' + JB_BIN;
 const JB_HEADS = {'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Versioning':'false'};
 const KEY_LOCAL = 'arraia2026v4';
@@ -504,78 +498,45 @@ const KEY_PEND_LOCAL = 'arraia2026v4_pendencias';
 let lista = SEED.map(d=>({...d, chopp:d.chopp||0, choppPago:d.choppPago||false, cel:d.cel||'',
   dorme:d.dorme||false, dormeQtd:d.dormeQtd||0}));
 
-// Verificar se há dados locais de versões anteriores para migrar
-function verificarMigracao(){
-  var chaves=['arraia2026v4','arraia2026v3','arraia2026v2','arraia2026'];
-  for(var i=0;i<chaves.length;i++){
-    try{
-      var s=localStorage.getItem(chaves[i]);
-      if(s){
-        var dados=JSON.parse(s);
-        if(Array.isArray(dados)&&dados.length>0){
-          document.getElementById('migrar-count').textContent=dados.length;
-          document.getElementById('migrar-overlay').style.display='flex';
-          window._dadosMigracao=dados;
-          return true;
-        }
-      }
-    }catch(e){}
-  }
-  return false;
-}
-function confirmarMigracao(){
-  var dados=window._dadosMigracao;
-  if(!dados) return;
-  document.getElementById('migrar-overlay').style.display='none';
-  mostrarCarregando(true);
-  lista=dados;
-  nextId=Math.max.apply(null,dados.map(function(d){return d.id;}).concat([99]))+1;
-  fetch(JB_URL,{
-    method:'PUT',
-    headers:JB_HEADS,
-    body:JSON.stringify({lista:dados,pendencias:[],ts:new Date().toISOString()})
-  }).then(function(){
-    // Limpar chaves antigas
-    ['arraia2026v4','arraia2026v3','arraia2026v2','arraia2026'].forEach(function(k){
-      localStorage.removeItem(k);
-    });
-    mostrarCarregando(false);
-    renderAll();renderLista();renderCad();
-    toast('Dados migrados para a nuvem com sucesso!');
-  }).catch(function(){
-    mostrarCarregando(false);
-    toast('Erro ao migrar — tente novamente');
-  });
-}
-function recusarMigracao(){
-  document.getElementById('migrar-overlay').style.display='none';
-  carregarJB();
-}
+// Migração removida — JSONBin é a fonte única de dados
 
 // Carregar dados do JSONBin (assíncrono)
 function carregarJB(){
   mostrarCarregando(true);
   fetch(JB_URL+'/latest', {headers:{'X-Master-Key':JB_KEY}})
-    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(r.status===401||r.status===404){throw new Error('bin_error');}
+      return r.json();
+    })
     .then(function(data){
       if(data && data.record && data.record.lista && data.record.lista.length>0){
         lista = data.record.lista;
-        nextId = Math.max(...lista.map(function(d){return d.id;}), 99) + 1;
-        // Salvar cópia local como fallback
-        try{localStorage.setItem(KEY_LOCAL, JSON.stringify(lista));}catch(e){}
+        nextId = Math.max.apply(null, lista.map(function(d){return d.id;}).concat([99])) + 1;
         renderAll(); renderLista(); renderCad();
+        toast('✓ ' + lista.length + ' convidados carregados');
       } else {
-        // JSONBin vazio — subir o SEED para ele
+        // JSONBin vazio — subir o SEED
+        lista = SEED.map(function(d){return Object.assign({},d,{chopp:d.chopp||0,choppPago:d.choppPago||false,cel:d.cel||'',dorme:d.dorme||false,dormeQtd:d.dormeQtd||0});});
         salvarJB();
+        toast('Base iniciada com ' + lista.length + ' convidados');
       }
       mostrarCarregando(false);
     })
-    .catch(function(){
-      // Sem internet — usar cópia local se disponível
-      try{
-        var s=localStorage.getItem(KEY_LOCAL);
-        if(s){ lista=JSON.parse(s); nextId=Math.max(...lista.map(function(d){return d.id;}),99)+1; }
-      }catch(e){}
+    .catch(function(e){
+      console.warn('JSONBin erro:', e);
+      // Criar novo bin automaticamente
+      if(e.message==='bin_error'){
+        fetch('https://api.jsonbin.io/v3/b',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Name':'arraia2026','X-Bin-Private':'true'},
+          body:JSON.stringify({lista:lista,pendencias:[],ts:new Date().toISOString()})
+        }).then(function(r){return r.json();})
+        .then(function(d){
+          if(d.metadata&&d.metadata.id){
+            alert('Novo Bin criado: '+d.metadata.id+' — anote este ID e me informe!');
+          }
+        }).catch(function(){});
+      }
       mostrarCarregando(false);
       renderAll(); renderLista(); renderCad();
     });
@@ -1909,10 +1870,13 @@ function ir(pg){
 }
 
 renderAll();renderCad();renderLista();
-// Verificar migração de dados locais ou carregar do JSONBin
-if(!verificarMigracao()){
-  carregarJB();
-}
+// Sempre carregar do JSONBin — fonte única de dados
+// Limpar qualquer localStorage antigo que possa causar conflito
+['arraia2026v4','arraia2026v3','arraia2026v2','arraia2026',
+ 'arraia2026v4_hash','arraia2026v3_hash'].forEach(function(k){
+  try{localStorage.removeItem(k);}catch(e){}
+});
+carregarJB();
 // Modo inicial: público — esconder nav completo, mostrar só "Para todos"
 (function(){
   document.querySelectorAll('.nav-btn').forEach(b=>{
