@@ -476,10 +476,30 @@ const SEED=[
 // ══════════════════════════════════════════════════════
 // JSONBIN — banco de dados na nuvem
 // ══════════════════════════════════════════════════════
-const JB_BIN   = '6a30b09ff5f4af5e29f8aa4f';
 const JB_KEY   = '$2a$10$AQ1CGpvvX5mL3eJIPvCeg.OozEH59rIH5Fk9RSsLJDNOmEPiRkFra';
-const JB_URL   = 'https://api.jsonbin.io/v3/b/' + JB_BIN;
+const JB_KEY_LOCAL = 'arraia2026_binid';
+// Bin ID salvo no localStorage para persistir entre sessões
+var JB_BIN = localStorage.getItem(JB_KEY_LOCAL) || '';
+var JB_URL = JB_BIN ? 'https://api.jsonbin.io/v3/b/' + JB_BIN : '';
 const JB_HEADS = {'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Versioning':'false'};
+
+function criarNovoBin(dadosIniciais){
+  return fetch('https://api.jsonbin.io/v3/b',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Name':'arraia2026','X-Bin-Private':'true'},
+    body:JSON.stringify({lista:dadosIniciais,pendencias:[],ts:new Date().toISOString()})
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    if(d.metadata&&d.metadata.id){
+      JB_BIN=d.metadata.id;
+      JB_URL='https://api.jsonbin.io/v3/b/'+JB_BIN;
+      localStorage.setItem(JB_KEY_LOCAL,JB_BIN);
+      console.log('Novo bin criado:',JB_BIN);
+      return true;
+    }
+    return false;
+  });
+}
 const KEY_LOCAL = 'arraia2026v4';
 const KEY_PEND_LOCAL = 'arraia2026v4_pendencias';
 
@@ -503,55 +523,72 @@ let lista = SEED.map(d=>({...d, chopp:d.chopp||0, choppPago:d.choppPago||false, 
 // Carregar dados do JSONBin (assíncrono)
 function carregarJB(){
   mostrarCarregando(true);
-  fetch(JB_URL+'/latest', {headers:{'X-Master-Key':JB_KEY}})
+  var dadosSeed=SEED.map(function(d){return Object.assign({},d,{chopp:d.chopp||0,choppPago:d.choppPago||false,cel:d.cel||'',dorme:d.dorme||false,dormeQtd:d.dormeQtd||0});});
+  // Se não tem bin ID, criar um novo
+  if(!JB_BIN){
+    console.log('Sem bin ID — criando novo bin...');
+    criarNovoBin(dadosSeed).then(function(ok){
+      if(ok){
+        lista=dadosSeed;
+        nextId=Math.max.apply(null,lista.map(function(d){return d.id;}).concat([99]))+1;
+        renderAll();renderLista();renderCad();
+        toast('✓ Novo banco criado com '+lista.length+' convidados');
+      }
+      mostrarCarregando(false);
+    }).catch(function(){mostrarCarregando(false);});
+    return;
+  }
+  fetch(JB_URL+'/latest',{headers:{'X-Master-Key':JB_KEY}})
     .then(function(r){
-      if(r.status===401||r.status===404){throw new Error('bin_error');}
+      if(r.status===401||r.status===403||r.status===404){
+        // Bin inválido — limpar e criar novo
+        localStorage.removeItem(JB_KEY_LOCAL);
+        JB_BIN=''; JB_URL='';
+        throw new Error('bin_invalido');
+      }
       return r.json();
     })
     .then(function(data){
-      if(data && data.record && data.record.lista && data.record.lista.length>0){
-        lista = data.record.lista;
-        nextId = Math.max.apply(null, lista.map(function(d){return d.id;}).concat([99])) + 1;
-        renderAll(); renderLista(); renderCad();
-        toast('✓ ' + lista.length + ' convidados carregados');
+      if(data&&data.record&&data.record.lista&&data.record.lista.length>0){
+        lista=data.record.lista;
+        nextId=Math.max.apply(null,lista.map(function(d){return d.id;}).concat([99]))+1;
+        renderAll();renderLista();renderCad();
+        toast('✓ '+lista.length+' convidados carregados');
       } else {
-        // JSONBin vazio — subir o SEED
-        lista = SEED.map(function(d){return Object.assign({},d,{chopp:d.chopp||0,choppPago:d.choppPago||false,cel:d.cel||'',dorme:d.dorme||false,dormeQtd:d.dormeQtd||0});});
+        lista=dadosSeed;
         salvarJB();
-        toast('Base iniciada com ' + lista.length + ' convidados');
+        toast('Base iniciada');
       }
       mostrarCarregando(false);
     })
     .catch(function(e){
-      console.warn('JSONBin erro:', e);
-      // Criar novo bin automaticamente
-      if(e.message==='bin_error'){
-        fetch('https://api.jsonbin.io/v3/b',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Name':'arraia2026','X-Bin-Private':'true'},
-          body:JSON.stringify({lista:lista,pendencias:[],ts:new Date().toISOString()})
-        }).then(function(r){return r.json();})
-        .then(function(d){
-          if(d.metadata&&d.metadata.id){
-            alert('Novo Bin criado: '+d.metadata.id+' — anote este ID e me informe!');
-          }
-        }).catch(function(){});
+      console.warn('Erro JSONBin:',e.message);
+      if(e.message==='bin_invalido'){
+        // Criar novo bin com dados atuais
+        criarNovoBin(dadosSeed).then(function(ok){
+          if(ok){lista=dadosSeed;renderAll();renderLista();renderCad();toast('✓ Novo banco criado');}
+          mostrarCarregando(false);
+        }).catch(function(){mostrarCarregando(false);});
+      } else {
+        mostrarCarregando(false);
+        renderAll();renderLista();renderCad();
       }
-      mostrarCarregando(false);
-      renderAll(); renderLista(); renderCad();
     });
 }
 
 // Salvar dados no JSONBin
 function salvarJB(){
+  if(!JB_URL){console.warn('Sem bin configurado');return;}
   fetch(JB_URL, {
     method:'PUT',
     headers:JB_HEADS,
     body:JSON.stringify({lista:lista, pendencias:carregarPendencias(), ts:new Date().toISOString()})
-  }).then(function(){
-    try{localStorage.setItem(KEY_LOCAL, JSON.stringify(lista));}catch(e){}
+  }).then(function(r){
+    if(r.status===401||r.status===403){
+      localStorage.removeItem(JB_KEY_LOCAL);
+      JB_BIN='';JB_URL='';
+    }
   }).catch(function(){
-    // Sem internet — salvar só local
     try{localStorage.setItem(KEY_LOCAL, JSON.stringify(lista));}catch(e){}
   });
 }
