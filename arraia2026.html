@@ -286,6 +286,13 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 </head>
 <body>
 <div class="bandeira"></div>
+<div id="loading-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,249,240,0.92);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="font-size:48px">🎪</div>
+  <div style="font-family:'Lora',serif;font-size:18px;color:#7A5C10;font-weight:600">Carregando dados...</div>
+  <div style="font-size:13px;color:#6B4226">Buscando informações atualizadas</div>
+  <div style="width:48px;height:48px;border:4px solid #F0E0C8;border-top-color:#F39C12;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
 <div class="fundo-junino" aria-hidden="true">
 <div class="fj-item " style="left:2%;top:8%">🎪</div>
 <div class="fj-item pequeno" style="left:15%;top:3%">🎪</div>
@@ -465,32 +472,102 @@ const SEED=[
   {id:41,nome:"Yasmin e Kevin (Postall)",pessoas:2,criancas:0,contrib:0,pg:false,prato:"Bolo de Paçoca Recheado",tipo:"DOCE",chopp:0,choppPago:false,cel:""}
 ];
 
-const KEY='arraia2026v3';
-const KEY_SEED_HASH='arraia2026v3_hash';
-// Calcula hash simples do SEED para detectar mudanças no arquivo
-function seedHash(){
-  const s=JSON.stringify(SEED);
-  let h=0;
-  for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}
-  return String(h);
-}
-// Só limpa o cache de dados se o SEED do arquivo mudou
-// Isso preserva cadastros e edições feitas pelo organizador
+// ══════════════════════════════════════════════════════
+// JSONBIN — banco de dados na nuvem
+// ══════════════════════════════════════════════════════
+const JB_BIN   = '6a30b09ff5f4af5e29f8aa4f';
+const JB_KEY   = '$2a$10$ithiYVCVRXLUM6EXA9U5S.HNk.nehOQmC08F3nUY7qDRevjRbJNm6';
+const JB_URL   = 'https://api.jsonbin.io/v3/b/' + JB_BIN;
+const JB_HEADS = {'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Versioning':'false'};
+const KEY_LOCAL = 'arraia2026v4';
+const KEY_PEND_LOCAL = 'arraia2026v4_pendencias';
+
+// Limpar chaves antigas de localStorage
 (function(){
   try{
-    const h=seedHash();
-    const prev=localStorage.getItem(KEY_SEED_HASH);
-    if(prev!==h){
-      localStorage.removeItem(KEY);
-      localStorage.removeItem('arraia2026v2');
-      localStorage.setItem(KEY_SEED_HASH,h);
-    }
+    ['arraia2026','arraia2026v2','arraia2026v3','arraia2026v3_hash',
+     'arraia2026_pendencias','arraia2026v3_pendencias',
+     'arraia2026_etag','arraia2026v3_ver','arraia2026v4_hash'].forEach(
+      function(k){localStorage.removeItem(k);}
+    );
   }catch(e){}
 })();
-function carregar(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):SEED.map(d=>({...d,chopp:d.chopp||0}))}catch(e){return SEED.map(d=>({...d,chopp:0,choppPago:false,cel:""}))}}
-function salvarLS(){try{localStorage.setItem(KEY,JSON.stringify(lista))}catch(e){}}
 
-let lista=carregar();
+// Iniciar com SEED — será sobrescrito pelos dados do JSONBin
+let lista = SEED.map(d=>({...d, chopp:d.chopp||0, choppPago:d.choppPago||false, cel:d.cel||'',
+  dorme:d.dorme||false, dormeQtd:d.dormeQtd||0}));
+
+// Carregar dados do JSONBin (assíncrono)
+function carregarJB(){
+  mostrarCarregando(true);
+  fetch(JB_URL+'/latest', {headers:{'X-Master-Key':JB_KEY}})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.record && data.record.lista && data.record.lista.length>0){
+        lista = data.record.lista;
+        nextId = Math.max(...lista.map(function(d){return d.id;}), 99) + 1;
+        // Salvar cópia local como fallback
+        try{localStorage.setItem(KEY_LOCAL, JSON.stringify(lista));}catch(e){}
+        renderAll(); renderLista(); renderCad();
+      } else {
+        // JSONBin vazio — subir o SEED para ele
+        salvarJB();
+      }
+      mostrarCarregando(false);
+    })
+    .catch(function(){
+      // Sem internet — usar cópia local se disponível
+      try{
+        var s=localStorage.getItem(KEY_LOCAL);
+        if(s){ lista=JSON.parse(s); nextId=Math.max(...lista.map(function(d){return d.id;}),99)+1; }
+      }catch(e){}
+      mostrarCarregando(false);
+      renderAll(); renderLista(); renderCad();
+    });
+}
+
+// Salvar dados no JSONBin
+function salvarJB(){
+  fetch(JB_URL, {
+    method:'PUT',
+    headers:JB_HEADS,
+    body:JSON.stringify({lista:lista, pendencias:carregarPendencias(), ts:new Date().toISOString()})
+  }).then(function(){
+    try{localStorage.setItem(KEY_LOCAL, JSON.stringify(lista));}catch(e){}
+  }).catch(function(){
+    // Sem internet — salvar só local
+    try{localStorage.setItem(KEY_LOCAL, JSON.stringify(lista));}catch(e){}
+  });
+}
+
+// Salvar pendências no JSONBin junto com os dados
+function salvarPendenciasJB(pends){
+  try{localStorage.setItem(KEY_PEND_LOCAL, JSON.stringify(pends));}catch(e){}
+  fetch(JB_URL, {
+    method:'PUT',
+    headers:JB_HEADS,
+    body:JSON.stringify({lista:lista, pendencias:pends, ts:new Date().toISOString()})
+  }).catch(function(){});
+}
+
+// Carregar pendências do JSONBin ou localStorage
+function carregarPendencias(){
+  try{
+    var s=localStorage.getItem(KEY_PEND_LOCAL);
+    return s?JSON.parse(s):[];
+  }catch(e){return[];}
+}
+
+// Substituir salvarLS pelo salvarJB
+function salvarLS(){ salvarJB(); }
+
+// Loading overlay
+function mostrarCarregando(show){
+  var el=document.getElementById('loading-overlay');
+  if(el) el.style.display=show?'flex':'none';
+}
+
+let lista_alias = lista; // alias para compatibilidade
 let nextId=Math.max(...lista.map(d=>d.id),99)+1;
 let filtro='todos';
 let editId=null;
@@ -1270,13 +1347,13 @@ setInterval(tickTimer,1000);
 
 // ══════ FASE 2 ══════
 const ORG_SENHA = 'Fe@2026';
-const KEY_PEND = 'arraia2026v3_pendencias';
+const KEY_PEND = 'arraia2026v4_pendencias';
 const KEY_MODE = 'arraia2026_mode';
 let modoAtual = 'pub'; // 'org' | 'guest'
 let guestId = null;
 
-function carregarPendencias(){try{const s=localStorage.getItem(KEY_PEND);return s?JSON.parse(s):[]}catch(e){return[]}}
-function salvarPendencias(p){try{localStorage.setItem(KEY_PEND,JSON.stringify(p))}catch(e){}}
+// carregarPendencias e salvarPendencias já definidas acima via JSONBin
+function salvarPendencias(p){salvarPendenciasJB(p);}
 
 // ── LOGIN ORGANIZADOR ───────────────────────────────────────────
 function abrirScreenOrg(){document.getElementById('screen-org').style.display='flex';document.getElementById('org-senha').focus();}
@@ -1777,6 +1854,8 @@ function ir(pg){
 }
 
 renderAll();renderCad();renderLista();
+// Carregar dados do JSONBin (sobrescreve o SEED)
+carregarJB();
 // Modo inicial: público — esconder nav completo, mostrar só "Para todos"
 (function(){
   document.querySelectorAll('.nav-btn').forEach(b=>{
