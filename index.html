@@ -244,6 +244,14 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 .massa-busca input{width:100%;padding:8px 10px 8px 30px;border:1px solid #D5B89A;border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:#2C1A0E}
 .massa-busca input:focus{outline:none;border-color:#8B6914}
 .massa-counter{font-size:11px;color:#6B4226;margin-top:4px}
+.acesso-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#fff;border:1px solid #F0E0C8;border-radius:8px;margin-bottom:6px}
+.acesso-icone{width:30px;height:30px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:14px;color:#27500A;flex-shrink:0}
+.acesso-nome{font-size:12px;font-weight:600;color:#2C1A0E}
+.acesso-data{font-size:11px;color:#6B4226;margin-top:1px}
+.mapa-prato-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid #F0E0C8;border-radius:10px;margin-bottom:6px}
+.mapa-prato-contador{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:#fff}
+.mapa-prato-nome{font-size:13px;font-weight:600;color:#2C1A0E}
+.mapa-prato-quem{font-size:11px;color:#6B4226;margin-top:1px;white-space:normal}
 @media(max-width:480px){.form-row{grid-template-columns:1fr}.topo h1{font-size:14px}.grid2{grid-template-columns:1fr 1fr}}
 .guest-edit-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:#7A5C10;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:10px;width:100%;justify-content:center}
 .guest-edit-btn:hover{background:#9A7612}
@@ -362,7 +370,9 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
   <button class="nav-btn" onclick="ir('pratos')"><i class="ti ti-tools-kitchen-2"></i>Pratos</button>
   <button class="nav-btn" onclick="ir('chopp')"><i class="ti ti-beer"></i>Chopp</button>
   <button class="nav-btn" onclick="ir('massa')"><i class="ti ti-table-edit"></i>Ed. massa</button>
+  <button class="nav-btn" onclick="ir('acessos')"><i class="ti ti-history"></i>Acessos</button>
   <button class="nav-btn" onclick="ir('pub')" data-pub="1"><i class="ti ti-speakerphone"></i>Para todos</button>
+  <button class="nav-btn" onclick="ir('mapapratos')" data-pub="1"><i class="ti ti-map-2"></i>Mapa de Pratos</button>
   <button class="nav-btn" id="nav-guest-btn" onclick="abrirScreenGuest()" data-guest="1" style="display:none"><i class="ti ti-user-check"></i>Minha presença</button>
   <button class="nav-btn" id="nav-sug-btn" data-guest="1" style="display:none" onclick="ir('sugestoes')"><i class="ti ti-salad"></i>Sugestões</button>
 </div>
@@ -379,7 +389,9 @@ label{font-size:11px;color:#6B4226;display:block;margin-bottom:3px;font-weight:5
 <div id="pg-pub" class="pg"></div>
 <div id="pg-guest" class="pg"></div>
 <div id="pg-massa" class="pg"></div>
+<div id="pg-acessos" class="pg"></div>
 <div id="pg-sugestoes" class="pg"></div>
+<div id="pg-mapapratos" class="pg"></div>
 <div class="bandeira" style="margin-top:8px"></div>
 <div class="toast" id="toast"></div>
 <div id="screen-org" class="screen" style="display:none">
@@ -506,6 +518,33 @@ function criarNovoBin(dadosIniciais){
 }
 const KEY_LOCAL = 'arraia2026v4';
 const KEY_PEND_LOCAL = 'arraia2026v4_pendencias';
+const KEY_LOG_LOCAL = 'arraia2026v4_acessos';
+
+function carregarLog(){
+  try{ var s=localStorage.getItem(KEY_LOG_LOCAL); return s?JSON.parse(s):[]; }catch(e){ return []; }
+}
+function registrarAcesso(convidado){
+  try{
+    var log=carregarLog();
+    log.push({
+      id: convidado.id,
+      nome: convidado.nome,
+      ts: new Date().toISOString()
+    });
+    if(log.length>500) log=log.slice(-500); // limitar tamanho
+    localStorage.setItem(KEY_LOG_LOCAL, JSON.stringify(log));
+    // Salvar também no JSONBin junto com os outros dados
+    if(JB_URL){
+      fetch(JB_URL,{method:'PATCH',headers:JB_HEADS,body:JSON.stringify({acessos:log})}).catch(function(){});
+    }
+  }catch(e){}
+}
+function fmtDataHora(iso){
+  try{
+    var d=new Date(iso);
+    return d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){ return iso; }
+}
 
 // Limpar chaves antigas de localStorage
 (function(){
@@ -635,9 +674,20 @@ function calc(){
   const cri=lista.reduce((a,c)=>a+c.criancas,0);
   const contrib=lista.reduce((a,c)=>a+c.contrib,0);
   const comPrato=lista.filter(d=>d.prato).length;
-  const sal=lista.filter(d=>d.tipo==='SALGADO'&&d.prato).length;
-  const doc=lista.filter(d=>d.tipo==='DOCE'&&d.prato).length;
-  const mis=lista.filter(d=>d.tipo==='MISTO'&&d.prato).length;
+  // Mesa do arraiá: contar PRATOS INDIVIDUAIS (separados por + ou e) por tipo real
+  let sal=0, doc=0;
+  lista.forEach(function(d){
+    if(!d.prato) return;
+    const itens=typeof splitPratos==='function'?splitPratos(d.prato):[d.prato];
+    const n=itens.length||1;
+    if(d.tipo==='SALGADO') sal+=n;
+    else if(d.tipo==='DOCE') doc+=n;
+    else if(d.tipo==='MISTO'){
+      // grupo "misto" sem separação clara: metade salgado, metade doce (arredondado)
+      sal+=Math.ceil(n/2); doc+=Math.floor(n/2);
+    }
+  });
+  const mis=0; // categoria "Misto" não é mais exibida no gráfico Mesa do arraiá
   const pgQtd=lista.filter(d=>d.pg).length;
   const totalChopp=lista.reduce((a,c)=>a+(c.chopp||0),0);
   const gruposChopp=lista.filter(d=>d.chopp>0).length;
@@ -693,11 +743,10 @@ function renderDash(){
   const pizzaPratos=pizzaSVG([
     {val:s.sal,color:'#E67E22',label:'Salgado'},
     {val:s.doc,color:'#D4537E',label:'Doce'},
-    {val:s.mis,color:'#7F77DD',label:'Misto'},
     {val:s.semPrato,color:'#E0D0B8',label:'Sem prato'}
   ],110);
   const totConv=s.adultos+s.cri||1;
-  const totPrat=s.sal+s.doc+s.mis+s.semPrato||1;
+  const totPrat=s.sal+s.doc+s.semPrato||1;
   document.getElementById('pg-dash').innerHTML=`
     ${modoAtual==='org'?renderPendencias():''}
     <div class="grid2">
@@ -752,7 +801,6 @@ function renderDash(){
         <div class="pizza-leg">
           <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#E67E22"></div><span>Salgado</span></div><span class="pizza-leg-pct">${s.sal} (${Math.round(s.sal/totPrat*100)}%)</span></div>
           <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#D4537E"></div><span>Doce</span></div><span class="pizza-leg-pct">${s.doc} (${Math.round(s.doc/totPrat*100)}%)</span></div>
-          <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#7F77DD"></div><span>Misto</span></div><span class="pizza-leg-pct">${s.mis} (${Math.round(s.mis/totPrat*100)}%)</span></div>
           <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#E0D0B8"></div><span>Sem prato</span></div><span class="pizza-leg-pct">${s.semPrato} (${Math.round(s.semPrato/totPrat*100)}%)</span></div>
         </div>
       </div>
@@ -1002,7 +1050,7 @@ function renderPub(){
   const dias=diasRestantes();
   const pctA=s.tot>0?Math.round(s.adultos/s.tot*100):0;
   const pctC=s.tot>0?Math.round(s.cri/s.tot*100):0;
-  const total=s.sal+s.doc+s.mis||1;
+  const total=s.sal+s.doc||1;
   const pratosPub=[...lista.filter(d=>d.prato)].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   const listaConf=[...lista].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   document.getElementById('pg-pub').innerHTML=`
@@ -1111,11 +1159,10 @@ function renderPub(){
         </div>
         <div class="pizza-card">
           <div class="pc-titulo">Mesa do arraiá</div>
-          ${pizzaSVG([{val:s.sal,color:'#E67E22'},{val:s.doc,color:'#D4537E'},{val:s.mis,color:'#7F77DD'}],100)}
+          ${pizzaSVG([{val:s.sal,color:'#E67E22'},{val:s.doc,color:'#D4537E'}],100)}
           <div class="pizza-leg">
             <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#E67E22"></div><span>Salgado</span></div><span class="pizza-leg-pct">${s.sal} (${Math.round(s.sal/total*100)}%)</span></div>
             <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#D4537E"></div><span>Doce</span></div><span class="pizza-leg-pct">${s.doc} (${Math.round(s.doc/total*100)}%)</span></div>
-            <div class="pizza-leg-item"><div style="display:flex;align-items:center;gap:4px"><div class="pizza-leg-cor" style="background:#7F77DD"></div><span>Misto</span></div><span class="pizza-leg-pct">${s.mis} (${Math.round(s.mis/total*100)}%)</span></div>
           </div>
         </div>
       </div>
@@ -1124,6 +1171,10 @@ function renderPub(){
       <div class="pub-filtro-pills">
         <button class="pub-pill todos on" id="pub-pill-todos" onclick="setPubFiltro('todos')">Todos</button>
         <button class="pub-pill" id="pub-pill-chopp" onclick="setPubFiltro('chopp')">🍺 No rateio do chopp</button>
+        <button class="pub-pill" id="pub-pill-pagou" onclick="setPubFiltro('pagou')">✅ Pagou contribuição</button>
+        <button class="pub-pill" id="pub-pill-naopagou" onclick="setPubFiltro('naopagou')">⏳ Falta pagar</button>
+        <button class="pub-pill" id="pub-pill-comprato" onclick="setPubFiltro('comprato')">🍽️ Confirmou prato</button>
+        <button class="pub-pill" id="pub-pill-semprato" onclick="setPubFiltro('semprato')">❓ Falta confirmar prato</button>
       </div>
       <div class="pub-busca-w">
         <i class="ti ti-search"></i>
@@ -1139,8 +1190,17 @@ function renderPub(){
             const CORES=['#C0392B','#E67E22','#F39C12','#27AE60','#16A085','#2980B9','#8E44AD','#D35400'];
             const listaFiltrada=listaConf.filter(d=>{
               const matchBusca=!buscaPub||d.nome.toLowerCase().includes(buscaPub);
-              const matchChopp=filtroPub!=='chopp'||(d.chopp>0);
-              return matchBusca&&matchChopp;
+              const matchF=(function(){
+                switch(filtroPub){
+                  case 'chopp': return d.chopp>0;
+                  case 'pagou': return !!d.pg;
+                  case 'naopagou': return !d.pg;
+                  case 'comprato': return !!d.prato;
+                  case 'semprato': return !d.prato;
+                  default: return true;
+                }
+              })();
+              return matchBusca&&matchF;
             });
             if(!listaFiltrada.length) return '<div style="text-align:center;padding:16px;color:#AAA;font-size:13px">Nenhum convidado encontrado</div>';
             return listaFiltrada.map((d,idx)=>{
@@ -1171,12 +1231,22 @@ function renderPub(){
 let pubFiltroAtivo='todos';
 function setPubFiltro(f){
   pubFiltroAtivo=f;
-  const pTodos=document.getElementById('pub-pill-todos');
-  const pChopp=document.getElementById('pub-pill-chopp');
-  if(pTodos) pTodos.classList.toggle('on', f==='todos');
-  if(pChopp) pChopp.classList.toggle('on', f==='chopp');
+  ['todos','chopp','pagou','naopagou','comprato','semprato'].forEach(function(k){
+    const el=document.getElementById('pub-pill-'+k);
+    if(el) el.classList.toggle('on', f===k);
+  });
   const busca=document.getElementById('pub-busca-nome')?.value||'';
   filtrarListaPub(busca);
+}
+function matchFiltroPub(d){
+  switch(pubFiltroAtivo){
+    case 'chopp': return d.chopp>0;
+    case 'pagou': return !!d.pg;
+    case 'naopagou': return !d.pg;
+    case 'comprato': return !!d.prato;
+    case 'semprato': return !d.prato;
+    default: return true;
+  }
 }
 function filtrarListaPub(v){
   const listaConf=[...lista].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
@@ -1186,8 +1256,7 @@ function filtrarListaPub(v){
   if(!card) return;
   const filtrado=listaConf.filter(d=>{
     const matchBusca=!busca||d.nome.toLowerCase().includes(busca);
-    const matchChopp=pubFiltroAtivo!=='chopp'||(d.chopp>0);
-    return matchBusca&&matchChopp;
+    return matchBusca&&matchFiltroPub(d);
   });
   card.innerHTML='<div style="font-size:12px;font-weight:600;margin-bottom:10px">Lista de Confirmação (Pratos e Pagamento)</div>'
     +(filtrado.length===0?'<div style="text-align:center;padding:16px;color:#AAA;font-size:13px">Nenhum convidado encontrado</div>'
@@ -1451,6 +1520,7 @@ function loginGuest(){
   if(!found){document.getElementById('guest-erro').style.display='block';return;}
   guestId=found.id;
   fecharScreenGuest();
+  registrarAcesso(found);
   ativarModoConvidado(found, window._guestRedirectEdit);
   window._guestRedirectEdit=false;
 }
@@ -1471,6 +1541,7 @@ function loginGuestInline(){
   }
   if(erEl) erEl.style.display='none';
   guestId=found.id;
+  registrarAcesso(found);
   ativarModoConvidado(found, false);
   // Re-renderizar pub para mostrar saudação e esconder formulário de celular
   renderPub();
@@ -1727,6 +1798,114 @@ function copiarSugestao(nome){
   }
 }
 
+function renderAcessos(){
+  const el=document.getElementById('pg-acessos');
+  if(!el) return;
+  const log=carregarLog().slice().reverse(); // mais recente primeiro
+  el.innerHTML=`
+    <div class="grid2">
+      <div class="kpi roxo"><div class="kl">Total de logins</div><div class="kv">${log.length}</div><div class="ks">registrados</div></div>
+      <div class="kpi verd"><div class="kl">Convidados únicos</div><div class="kv">${new Set(log.map(l=>l.id)).size}</div><div class="ks">já acessaram</div></div>
+    </div>
+    <div class="sec">Histórico de acessos (mais recente primeiro)</div>
+    ${log.length===0?'<div class="empty">Nenhum acesso registrado ainda</div>':
+      log.map(l=>{
+        const idxConv=lista.findIndex(d=>d.id===l.id);
+        const icone=idxConv>=0?juninoIcon(idxConv):'👤';
+        return '<div class="acesso-item"><div class="acesso-icone">'+icone+'</div><div class="ri-info"><div class="acesso-nome">'+l.nome+'</div><div class="acesso-data">'+fmtDataHora(l.ts)+'</div></div></div>';
+      }).join('')}
+    ${log.length>0?'<button class="btn-sec" style="margin-top:10px" onclick="limparLog()"><i class=\'ti ti-trash\' style=\'font-size:13px;vertical-align:-2px\'></i> Limpar histórico</button>':''}
+  `;
+}
+function limparLog(){
+  if(!confirm('Limpar todo o histórico de acessos?')) return;
+  localStorage.removeItem(KEY_LOG_LOCAL);
+  renderAcessos();
+  toast('Histórico limpo');
+}
+
+const PALAVRAS_PRATO=['bolo','torta','caldo','doce','pudim','arroz','salgad','empadão','empada','pão','pao','canjica','chá','cha','quentão','quentao','vinho','sonho','cocada','paçoca','pacoca','paçoquinha','pacoquinha','rapadura','pamonha','tapioca','milho','pinhão','pinhao','brigadeiro','curau','cural','mungunzá','queijadinha','rabanada','churros','maçã','maca','pé-de','pe-de','romeu','farofa','feijão','feijao','vaca atolada','croquete','pastel','pipoca','torresmo','espetinho','polenta','biscoito','cuscuz','escondidinho','quibe','enroladinho','fritada','frango','carne','suco','sorvete','chocolate','goiabada','leite','amendoim','caju','jaca','laranja','mamão','mamao','figo','banana','batata','abóbora','abobora','bombocado','cajuzinho','maria-mole','quebra-queixo','rosquinha','salsicha','quenga'];
+function pareceP(txt){
+  const t=txt.trim().toLowerCase();
+  if(t.split(/\s+/).length>=2) return true;
+  return PALAVRAS_PRATO.some(function(p){return t.indexOf(p)>=0;});
+}
+function splitPratos(texto){
+  if(!texto) return [];
+  const partes=texto.split('+').map(function(p){return p.trim();});
+  let resultado=[];
+  partes.forEach(function(parte){
+    if(parte.indexOf('(')>=0||parte.indexOf(')')>=0){
+      resultado.push(parte.trim().replace(/,$/,''));
+      return;
+    }
+    if(parte.indexOf(',')>=0 && /,\s*\S+.*\be\b\s*\S+/i.test(parte)){
+      const sub=parte.split(/,\s*|\s+e\s+/i).map(function(s){return s.trim();}).filter(function(s){return s;});
+      if(sub.length>1 && sub.every(pareceP)){
+        resultado=resultado.concat(sub);
+        return;
+      }
+    }
+    const m=parte.split(/\s+e\s+/i);
+    if(m.length===2 && pareceP(m[0]) && pareceP(m[1])){
+      resultado.push(m[0].trim());
+      resultado.push(m[1].trim());
+    } else {
+      resultado.push(parte.trim());
+    }
+  });
+  return resultado.filter(function(r){return r;});
+}
+
+function renderMapaPratos(){
+  const el=document.getElementById('pg-mapapratos');
+  if(!el) return;
+  const comPrato=lista.filter(d=>d.prato&&d.prato.trim());
+  // Separar pratos compostos (ex: "Bolo X + Torta Y" ou "Bolo X e Doce Y") e agrupar por nome normalizado
+  const grupos={};
+  comPrato.forEach(d=>{
+    const itensPrato=splitPratos(d.prato);
+    itensPrato.forEach(function(item){
+      const chave=item.toLowerCase();
+      if(!grupos[chave]) grupos[chave]={nomeOriginal:item,tipo:d.tipo,qtd:0,quem:[]};
+      grupos[chave].qtd++;
+      grupos[chave].quem.push(d.nome);
+    });
+  });
+  const listaGrupos=Object.values(grupos).sort((a,b)=>b.qtd-a.qtd||a.nomeOriginal.localeCompare(b.nomeOriginal,'pt-BR'));
+  const duplicados=listaGrupos.filter(g=>g.qtd>1);
+  const unicos=listaGrupos.filter(g=>g.qtd===1);
+  function corTipo(t){
+    if(t==='SALGADO') return '#E67E22';
+    if(t==='DOCE') return '#D4537E';
+    if(t==='MISTO') return '#7F77DD';
+    return '#999';
+  }
+  el.innerHTML=`
+    <div class="grid2">
+      <div class="kpi verd"><div class="kl">Pratos diferentes</div><div class="kv">${listaGrupos.length}</div><div class="ks">variedade no cardápio</div></div>
+      <div class="kpi roxo"><div class="kl">Pratos repetidos</div><div class="kv">${duplicados.length}</div><div class="ks">vão se repetir</div></div>
+    </div>
+    ${duplicados.length>0?`
+    <div class="sec">🔁 Pratos que vão se repetir</div>
+    ${duplicados.map(g=>`<div class="mapa-prato-item">
+        <div class="mapa-prato-contador" style="background:${corTipo(g.tipo)}">${g.qtd}x</div>
+        <div class="ri-info">
+          <div class="mapa-prato-nome">${g.nomeOriginal}</div>
+          <div class="mapa-prato-quem">${g.quem.join(' · ')}</div>
+        </div>
+      </div>`).join('')}`:''}
+    <div class="sec">Cardápio completo (${listaGrupos.length} pratos)</div>
+    ${listaGrupos.length===0?'<div class="empty">Nenhum prato confirmado ainda</div>':
+      listaGrupos.map(g=>`<div class="mapa-prato-item">
+        <div class="mapa-prato-contador" style="background:${corTipo(g.tipo)}">${g.qtd}x</div>
+        <div class="ri-info">
+          <div class="mapa-prato-nome">${g.nomeOriginal}</div>
+          <div class="mapa-prato-quem">${g.quem.join(' · ')}</div>
+        </div>
+      </div>`).join('')}
+  `;
+}
 function renderMassa(){
   const el=document.getElementById('pg-massa');
   if(!el) return;
@@ -1897,7 +2076,7 @@ function ir(pg){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   document.getElementById('pg-'+pg).classList.add('on');
-  const m={dash:0,lista:1,cad:2,pratos:3,chopp:4,pub:5,massa:6};
+  const m={dash:0,lista:1,cad:2,pratos:3,chopp:4,massa:5,acessos:6,pub:7,mapapratos:8};
   if(m[pg]!==undefined) document.querySelectorAll('.nav-btn')[m[pg]]?.classList.add('on');
   if(pg==='cad'&&!editId) renderCad();
   if(pg==='lista') renderLista();
@@ -1905,8 +2084,10 @@ function ir(pg){
   if(pg==='pratos') renderPratos();
   if(pg==='chopp') renderChopp();
   if(pg==='pub'){renderPub();setTimeout(tickTimer,50);}
+  if(pg==='mapapratos') renderMapaPratos();
   if(pg==='guest') renderGuest();
   if(pg==='massa') renderMassa();
+  if(pg==='acessos') renderAcessos();
   if(pg==='sugestoes') renderSugestoes();
 }
 
