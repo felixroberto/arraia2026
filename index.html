@@ -1803,37 +1803,26 @@ function limparLog(){
   toast('Histórico limpo');
 }
 
-const PALAVRAS_PRATO=['bolo','torta','caldo','doce','pudim','arroz','salgad','empadão','empada','pão','pao','canjica','chá','cha','quentão','quentao','vinho','sonho','cocada','paçoca','pacoca','paçoquinha','pacoquinha','rapadura','pamonha','tapioca','milho','pinhão','pinhao','brigadeiro','curau','cural','mungunzá','queijadinha','rabanada','churros','maçã','maca','pé-de','pe-de','romeu','farofa','feijão','feijao','vaca atolada','croquete','pastel','pipoca','torresmo','espetinho','polenta','biscoito','cuscuz','escondidinho','quibe','enroladinho','fritada','frango','carne','suco','sorvete','chocolate','goiabada','leite','amendoim','caju','jaca','laranja','mamão','mamao','figo','banana','batata','abóbora','abobora','bombocado','cajuzinho','maria-mole','quebra-queixo','rosquinha','salsicha','quenga'];
-function pareceP(txt){
-  const t=txt.trim().toLowerCase();
-  if(t.split(/\s+/).length>=2) return true;
-  return PALAVRAS_PRATO.some(function(p){return t.indexOf(p)>=0;});
-}
+// ── splitPratos: separa pratos compostos ─────────────────────────
+// Regras: + sempre separa | , e " e " sempre separam (exceto dentro de parênteses)
+// "com" nunca separa (é ingrediente do mesmo prato)
 function splitPratos(texto){
-  if(!texto) return [];
-  const partes=texto.split('+').map(function(p){return p.trim();});
-  let resultado=[];
-  partes.forEach(function(parte){
-    if(parte.indexOf('(')>=0||parte.indexOf(')')>=0){
-      resultado.push(parte.trim().replace(/,$/,''));
+  if(!texto||!texto.trim()) return [];
+  var resultado=[];
+  // 1. Dividir por +
+  var porMais=texto.split('+').map(function(p){return p.trim();}).filter(function(p){return p;});
+  porMais.forEach(function(parte){
+    // 2. Se tem parênteses → manter inteiro (ex: "Mini Salgados (Coxinha, etc)")
+    if(parte.indexOf('(')>=0){
+      resultado.push(parte);
       return;
     }
-    if(parte.indexOf(',')>=0 && /,\s*\S+.*\be\b\s*\S+/i.test(parte)){
-      const sub=parte.split(/,\s*|\s+e\s+/i).map(function(s){return s.trim();}).filter(function(s){return s;});
-      if(sub.length>1 && sub.every(pareceP)){
-        resultado=resultado.concat(sub);
-        return;
-      }
-    }
-    const m=parte.split(/\s+e\s+/i);
-    if(m.length===2 && pareceP(m[0]) && pareceP(m[1])){
-      resultado.push(m[0].trim());
-      resultado.push(m[1].trim());
-    } else {
-      resultado.push(parte.trim());
-    }
+    // 3. Dividir por " e " e "," — ambos são separadores
+    var norm=parte.replace(/\s+e\s+/gi,'|||').replace(/\s*,\s*/g,'|||');
+    var itens=norm.split('|||').map(function(i){return i.trim();}).filter(function(i){return i;});
+    itens.forEach(function(i){resultado.push(i);});
   });
-  return resultado.filter(function(r){return r;});
+  return resultado;
 }
 
 function renderMapaPratos(){
