@@ -2123,53 +2123,146 @@ function renderRelatorio(){
       <button class="btn-pdf" onclick="baixarRelPDF()"><i class="ti ti-file-type-pdf" style="font-size:18px"></i> Baixar como PDF</button>
     </div>`;
 }
-function baixarRelImg(){
-  toast('Gerando imagem...');
-  setTimeout(()=>{
-    html2canvas(document.getElementById('rel-captura'),{
-      scale:2,backgroundColor:'#fff',useCORS:true,allowTaint:true,logging:false
-    }).then(canvas=>{
-      const a=document.createElement('a');
-      a.download='arraia2026-relatorio.png';
-      a.href=canvas.toDataURL('image/png');
-      a.click();
-      toast('Imagem salva!');
-    }).catch(()=>toast('Erro ao gerar imagem'));
-  },300);
+// ── Gera HTML completo da tabela fora da tela ─────────────────────
+function _buildRelHTML(){
+  const sorted=[...lista].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  let totP=0,totC=0;
+  const adultos=lista.reduce((a,d)=>a+d.pessoas-(d.criancas||0),0);
+  const criancas=lista.reduce((a,d)=>a+(d.criancas||0),0);
+  function tipoBadge(t){
+    const map={SALGADO:'background:#FFD7D7;color:#8B0000',DOCE:'background:#D7FFD7;color:#276221',MISTO:'background:#FFF3CD;color:#7B5800'};
+    const label={SALGADO:'SALGADO',DOCE:'DOCE',MISTO:'SALGADO / DOCE'};
+    if(!t||!map[t]) return '';
+    return `<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;${map[t]}">${label[t]}</span>`;
+  }
+  const rows=sorted.map((d,i)=>{
+    const ok=d.pg&&d.prato&&d.prato.trim();
+    const bg=ok?'#C6EFCE':(i%2===0?'#fff':'#F5F5F5');
+    const ft=ok?'#276221':'#111';
+    const fw=ok?'700':'400';
+    totP+=d.pessoas; if(d.chopp>0) totC+=d.chopp;
+    return `<tr style="background:${bg};color:${ft};font-weight:${fw}">
+      <td style="padding:5px 8px;border:1px solid #ddd;font-size:11px">${d.nome}</td>
+      <td style="padding:5px 8px;border:1px solid #ddd;text-align:center;font-size:11px">${d.pessoas}</td>
+      <td style="padding:5px 8px;border:1px solid #ddd;text-align:center;font-size:11px;color:${d.pg?'#276221':'#ccc'};font-weight:700">${d.pg?'PG':''}</td>
+      <td style="padding:5px 8px;border:1px solid #ddd;font-size:10px">${d.prato||''}</td>
+      <td style="padding:5px 8px;border:1px solid #ddd;text-align:center;font-size:11px;color:${d.chopp>0?'#185FA5':'#aaa'}">${d.chopp>0?'SIM':'NÃO'}</td>
+      <td style="padding:5px 8px;border:1px solid #ddd;text-align:center;font-size:11px;color:#185FA5;font-weight:${d.chopp>0?700:400}">${d.chopp>0?d.chopp:''}</td>
+      <td style="padding:5px 8px;border:1px solid #ddd;text-align:center">${tipoBadge(d.tipo)}</td>
+    </tr>`;
+  }).join('');
+  return `<div style="background:#fff;font-family:Arial,sans-serif;padding:0;width:1200px">
+    <div style="background:#1F4E79;color:#fff;padding:14px 20px;font-size:15px;font-weight:700;text-align:center;letter-spacing:1px">
+      🎪 ARRAIÁ DOS AMIGOS · FELIX &amp; WARLEY 2026 · 5ª EDIÇÃO
+    </div>
+    <div style="background:#D9E1F2;color:#333;font-size:11px;text-align:center;padding:5px">
+      04 de julho de 2026 · a partir das 14h30 · Lista de convidados e pratos
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#1F4E79;color:#fff">
+          <th style="padding:7px 8px;border:1px solid #2E75B6;font-size:11px;text-align:left;width:22%">NOME</th>
+          <th style="padding:7px 8px;border:1px solid #2E75B6;font-size:11px;text-align:center;width:7%">Nº PESSOAS</th>
+          <th style="padding:7px 8px;border:1px solid #2E75B6;font-size:10px;text-align:center;width:10%">CONTRIBUIÇÃO<br>R$ 20 - MAIORES DE 12 ANOS</th>
+          <th style="padding:7px 8px;border:1px solid #2E75B6;font-size:11px;text-align:left;width:33%">PRATO</th>
+          <th style="padding:7px 8px;border:1px solid #2E75B6;font-size:11px;text-align:center;width:9%">RATEIO CHOPP?</th>
+          <th style="padding:7px 8px;border:1px solid #2E75B6;font-size:11px;text-align:center;width:7%">QTDE. CHOPP</th>
+          <th style="padding:7px 8px;border:1px solid #2E75B6;font-size:11px;text-align:center;width:12%">TIPO DE PRATO</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr style="background:#1F4E79;color:#FFE600;font-weight:700">
+          <td style="padding:7px 8px;border:1px solid #2E75B6;font-size:11px">TOTAL CONVIDADOS (INCLUINDO CRIANÇAS)</td>
+          <td style="padding:7px 8px;border:1px solid #2E75B6;text-align:center;font-size:13px">${totP}</td>
+          <td style="padding:7px 8px;border:1px solid #2E75B6"></td>
+          <td style="padding:7px 8px;border:1px solid #2E75B6"></td>
+          <td style="padding:7px 8px;border:1px solid #2E75B6;text-align:right;font-size:10px">TOTAL CHOPP</td>
+          <td style="padding:7px 8px;border:1px solid #2E75B6;text-align:center;font-size:13px">${totC}</td>
+          <td style="padding:7px 8px;border:1px solid #2E75B6"></td>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="display:flex;justify-content:flex-end;gap:32px;padding:10px 20px;background:#F0F4FA;border-top:2px solid #D0D8E0">
+      <div style="font-size:12px"><span style="color:#444;margin-right:8px">Adultos</span><strong style="color:#185FA5;font-size:15px">${adultos}</strong></div>
+      <div style="font-size:12px"><span style="color:#444;margin-right:8px">Crianças (menores de 12 anos)</span><strong style="color:#8E44AD;font-size:15px">${criancas}</strong></div>
+    </div>
+  </div>`;
 }
+
+// Monta elemento fora da tela, captura tudo, depois remove
+function _capturarRelatorio(callback){
+  toast('Preparando relatório completo...');
+  const wrapper=document.createElement('div');
+  wrapper.style.cssText='position:fixed;top:-9999px;left:-9999px;z-index:-1;overflow:visible';
+  wrapper.innerHTML=_buildRelHTML();
+  document.body.appendChild(wrapper);
+  const el=wrapper.firstElementChild;
+  setTimeout(()=>{
+    html2canvas(el,{
+      scale:2,
+      backgroundColor:'#fff',
+      useCORS:true,
+      allowTaint:true,
+      logging:false,
+      width:el.offsetWidth,
+      height:el.offsetHeight,
+      windowWidth:1200,
+      scrollX:0,
+      scrollY:0
+    }).then(canvas=>{
+      document.body.removeChild(wrapper);
+      callback(canvas);
+    }).catch(e=>{
+      document.body.removeChild(wrapper);
+      console.error(e);
+      toast('Erro ao gerar relatório');
+    });
+  },400);
+}
+
+function baixarRelImg(){
+  _capturarRelatorio(canvas=>{
+    const a=document.createElement('a');
+    a.download='arraia2026-relatorio.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+    toast('✓ Imagem salva!');
+  });
+}
+
 function baixarRelPDF(){
-  toast('Gerando PDF...');
-  setTimeout(async()=>{
+  _capturarRelatorio(async canvas=>{
     try{
       const {jsPDF}=window.jspdf;
-      const canvas=await html2canvas(document.getElementById('rel-captura'),{
-        scale:2,backgroundColor:'#fff',useCORS:true,allowTaint:true,logging:false
-      });
-      const pw=297,ph=210; // A4 landscape
-      const ih=Math.round((canvas.height/canvas.width)*pw);
+      // Calcular páginas A4 landscape (297x210mm) a 150dpi
+      const MM_PER_PX=210/canvas.width; // escala px→mm baseada na altura A4
+      const pW=297, pH=210;
+      const imgW=pW;
+      const imgH=Math.round(canvas.height*(pW/canvas.width));
       const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-      if(ih<=ph){
-        pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,pw,ih);
+      if(imgH<=pH){
+        pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,imgW,imgH);
       } else {
-        // Tabela maior que uma página — dividir em páginas
-        const pxPerMm=canvas.width/pw;
-        const sliceH=Math.floor(ph*pxPerMm);
-        let offsetY=0;
-        while(offsetY<canvas.height){
-          const sliceCanvas=document.createElement('canvas');
-          sliceCanvas.width=canvas.width;
-          sliceCanvas.height=Math.min(sliceH,canvas.height-offsetY);
-          sliceCanvas.getContext('2d').drawImage(canvas,0,-offsetY);
-          const sliceH_mm=Math.round(sliceCanvas.height/pxPerMm);
-          if(offsetY>0) pdf.addPage('a4','landscape');
-          pdf.addImage(sliceCanvas.toDataURL('image/png'),'PNG',0,0,pw,sliceH_mm);
-          offsetY+=sliceH;
+        // Dividir em fatias de página
+        const ratio=canvas.width/pW;
+        const sliceHpx=Math.floor(pH*ratio);
+        let y=0;
+        while(y<canvas.height){
+          const hpx=Math.min(sliceHpx,canvas.height-y);
+          const c2=document.createElement('canvas');
+          c2.width=canvas.width; c2.height=hpx;
+          c2.getContext('2d').drawImage(canvas,0,y,canvas.width,hpx,0,0,canvas.width,hpx);
+          const h2mm=Math.round(hpx/ratio);
+          if(y>0) pdf.addPage('a4','landscape');
+          pdf.addImage(c2.toDataURL('image/png'),'PNG',0,0,pW,h2mm);
+          y+=sliceHpx;
         }
       }
       pdf.save('arraia2026-relatorio.pdf');
-      toast('PDF salvo!');
+      toast('✓ PDF salvo!');
     }catch(e){console.error(e);toast('Erro ao gerar PDF');}
-  },300);
+  });
 }
 function renderAll(){renderDash();renderPratos();renderChopp();renderPub();if(document.getElementById('pg-mapapratos').classList.contains('on'))renderMapaPratos();}
 
